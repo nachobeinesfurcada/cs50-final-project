@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+
+{% for user in user %}
+
+    name = {{user.name}}
+    last name = {{user.lastname}}
+
+{% endfor %}
+
+{% endblock %}

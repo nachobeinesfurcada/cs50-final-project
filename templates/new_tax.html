@@ -6,6 +6,48 @@
 
 {% block main %}
 
-new tax
+    <script type="text/javascript"></script>
+
+    <div>
+        <h2 style="text-align:center">Add new Tax</h2>
+    </div>
+    <br>    
+    <div>
+        <h6 style="text-align:center">Here you will be able to add new tax that will automatically impact on your finances.</h6>
+        <h6 style="text-align:center">If by mistake you add a tax, then you will be able to remove it.</h6>
+    </div>
+
+    <main class="container py-5 text-center">
+        <form action="/new_tax" method="post">
+            <br>
+            <p>
+                <button id="button" class="btn btn-primary" type="submit">Add new tax</button>
+            </p>
+            <p>To add a new tax, select the ones you want to add on the table bellow. </p>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-start">Tax ID</th>
+                        <th class="text-center">Tax Name</th>
+                        <th class="text-center">Country</th>
+                        <th class="text-end">Percentage</th>
+                        <th style="color: blue" class="text-end">Add tax</th>
+                    </tr>
+                </thead>
+            <tbody>
+                    {% for taxes in taxes %}
+                        <tr>
+                            <td class="text-start">{{ taxes.id }}</td>
+                            <td class="text-center">{{ taxes.name }}</td>
+                            <td class="text-center">{{ taxes.country }}</td>
+                            <td class="text-end">{{ taxes.percentage }}</td>
+                            <td class="text-end"><input id="checkbox" type="checkbox" onclick="enable()"/>   &nbsp;   </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </form>
+    
+    </main>
 
 {% endblock %}
