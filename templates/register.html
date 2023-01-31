@@ -6,7 +6,7 @@
 
 {% block main %}
     <div>
-        <h4 style="text-align:center">Register</h2>
+        <h3 style="text-align:center">Register</h3>
     </div>
     <br>
     <form action="/register" method="post">
@@ -19,6 +19,30 @@
         <div class="mb-3">
             <input class="form-control mx-auto w-auto" id="password" name="confirmation" placeholder="Repeat Password" type="password">
         </div>
-        <button class="btn btn-primary" type="submit">Register</button>
+
+        <ab>
+            <br><h5>For what will you use this app?</h5><br>
+            <select name="type_of_user">
+                <option disabled selected>--Usage-- </option>
+                {% for type_of_user in type_of_user %}
+                <option text-align="center" value="{{ type_of_user }}">{{ type_of_user }}</option>
+                {% endfor %}
+            </select>
+        </ab> <br>
+
+        <ab>
+            <br><h5>Which is your level of Expertise on Finances? </h5>
+            This input will define how you see the app.<br>
+            More advanced, more parameters you can use <br>
+            <br><select name="expertise"><br>
+                <option disabled selected>--Level of Expertise-- </option>
+                {% for expertise in expertise %}
+                <option text-align="center" value="{{ expertise }}">{{ expertise }}</option>
+                {% endfor %}
+            </select><br>
+        </ab> <br>
+            
+        <br> <button class="btn btn-primary" type="submit">Register</button>
+
     </form>
 {% endblock %}

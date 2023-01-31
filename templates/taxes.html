@@ -13,10 +13,14 @@
         <h6 style="text-align:center">Here you will find the list of taxes you have. To add a new one, click "Add new tax".</h6>
     </div>
     <br>
+        
+    <form action="/new_tax" method="post">    
         <div>
-            <a href="new_tax.html" class="button">Add new tax</a>
+            <a href="/new_tax" class="button" >Add new tax</a>
         </div>
     <br>
+
+    </form>
 
     <main class="container py-5 text-center">
 
@@ -33,8 +37,8 @@
                 {% for taxes in taxes %}
                     <tr>
                         <td class="text-start">{{ taxes.id }}</td>
+                        <td class="text-center">{{ taxes.name }}</td>
                         <td class="text-center">{{ taxes.country }}</td>
-                        <td class="text-center">{{ taxes.tax_name }}</td>
                         <td class="text-end">{{ taxes.percentage }}</td>
                     </tr>
                 {% endfor %}
