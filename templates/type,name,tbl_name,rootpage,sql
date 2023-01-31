@@ -1,0 +1,3 @@
+type,name,tbl_name,rootpage,sql
+table,users,users,2,"CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, username TEXT NOT NULL, hash TEXT NOT NULL)"
+table,sqlite_sequence,sqlite_sequence,3,"CREATE TABLE sqlite_sequence(name,seq)"
