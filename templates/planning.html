@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block main %}
+    <div>
+        {% for name in name %}
+        <h2 style="text-align:center">Welcome to Planning, {{ name.name }}</h2>
+        {% endfor %}
+    </div>
+
+    <br>    
+    <div>
+        <h6 style="text-align:center">Here you will be able to make a plan for the period of your choice. <h6>
+    </div>
+    <br>
+        
+    
+    <a class="hyperlinks" href="#income">Income</a><a class="hyperlinks" href="#expenses">|           Expenses</a> 
+    <br><br>
+    <form action="/planning" method="post">
+        <div class="period container">
+            <br>
+            <h3>Period</h3>
+            <p>Please select the period you want to do some planning. </p>
+            <input class="btn btn-primary" id ="day" type="button" value="  Day  ">
+            <input class="btn btn-primary" id ="month "type="button" value=" Month ">
+            <input class="btn btn-primary" id ="quarter" type="button" value="Quarter">
+            <input class="btn btn-primary" id ="year" type="button" value=" Year  ">
+            <br><br>
+        </div><br><br>
+        <div class="income " id="income">
+            <br><h3>Expected Income</h3>
+            <p>Please insert the income you expect to have over this period.  <br>You will be able to change it if it suffers modifications. 
+            <div class="input-group" >
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="">Currency and Income</span>
+                </div class="input-group">
+                    <select name="currency">
+                    <option disabled selected>Currency</option>
+                    {% for currency in currencies %}
+                        <option value="{{ currency }}">{{ currency }}</option>
+                    {% endfor %}
+                </select>
+                <input type="text" size="10" placeholder="00.00" size="50">
+            </div>
+            <br><br>
+            <h5 class="past-incomes">Past Incomes...</h5>
+            <!-- to do insert past incomes-->
+        </div>
+        <br>
+        <div class="expenses_container" id="expenses">
+            <br><h3>Expected Expenses</h3>
+            <p>Please insert the expenses you expect to have over this period.  <br><br><p>If you don´t see an expense you want to use, , feel free to add one to your list <a href="/add_expense">here</a>.</p>
+            <h5>Add expenses to your planning</h5>
+            <a href="#" class="add">&plus;</a>
+        
+            <div class="inp-group"></div>
+        </div>
+        <script>
+            const addBtn = document.querySelector(".add");
+
+            const input = document.querySelector(".inp-group");
+
+            function addInput() {
+                const ExpenseName = document.createElement("input");
+                ExpenseName.type="text";
+                Currency.placeholder="Expense name"
+
+                const Currency = document.createElement("input");
+                Currency.type="text";
+                Currency.placeholder="Currency"
+                
+                const Amount = document.createElement("input");
+                Amount.type="integer";
+                Amount.placeholder="00.00"
+
+                const AddExpense = document.createElement("input");
+                
+                const btn = document.createElement("a");
+                btn.className = "delete";
+                btn.innerHTML = "&times";
+
+                const flex = document.createElement("div");
+                flex.className = "flex";
+                
+                input.appendChild(flex);
+                flex.appendChild(ExpenseName);
+                flex.appendChild(Currency);
+                flex.appendChild(Amount);
+                flex.appendChild(AddExpense);
+                flex.appendChild(btn);
+
+
+            }
+            addBtn.addEventListener("click", addInput);
+
+        </script>
+    </form>
+
+
+
+{% endblock %}

@@ -24,17 +24,80 @@ a.button {
 
 
 
-.select {
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    font: normal 11px/22px Arial, Sans-Serif;
-    color: black;
-    border: 1px solid #ccc;
-  }
 
  /* Styling error flashes */
   .error {
     color: rgba(255, 214, 79, 0.623)
 }
 
+.income {
+    background-color: azure;
+}
+
+.past-incomes {
+    color:rgb(167, 167, 167)
+}
+
+.hyperlinks {
+    color:rgb(138, 138, 138)
+}
+
+.period {
+    background-color: rgb(224, 224, 224);
+}
+
+.expenses {
+    background-color: azure;
+}
+
+.add_expense {
+    background-color: rgba(193, 255, 86, 0.515);
+}
+
+.grey {
+    background-color: rgba(128,128,128,.25);
+  }
+  .green {
+    background-color: rgba(193, 255, 86, 0.515);
+  }
+
+.container {
+    text-align:center;
+
+    margin: 0 auto;
+    position: relative;
+}
+
+.child {
+
+    margin: auto;
+}
+form {
+    text-align: center;
+    align-items: center;
+  }
+
+
+
+/* dynamic class creation */
+.flex {
+    display: flex;
+    gap: 1.5em;
+
+}
+.delete {
+    text-decoration: none;
+    display: inline-block;
+    background:rgb(167, 167, 167);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight:bold;
+    width: 30px;
+    height: 30px;
+    color: #fff;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}

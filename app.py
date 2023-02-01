@@ -26,6 +26,8 @@ db = SQL("sqlite:///ultimate_finance.db")
 type_of_user = ["Personal", "Enterprise", "Personal & Enterprise"]
 expertise = ["Begginer", "Intermediate", "Expert"]  
 
+currencies = ["ARS","REAL", "USD"]
+
 
 @app.after_request
 def after_request(response):
@@ -132,12 +134,79 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
+@app.route("/planning", methods=["GET", "POST"])
+@login_required
+def planning():
+        
+    # get user id to pass as a list to html 
+    user_id = session["user_id"]
+    name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
+    
+    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ?", user_id)
+
+    if request.method == "POST":
+    
+        return redirect("/")
+
+    return render_template("planning.html", name=name, currencies=currencies, expenses=expenses) 
+
+@app.route("/add_expense", methods=["GET", "POST"])
+@login_required
+def add_expense():
+    
+    user_id = session["user_id"]
+    name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
+    
+    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ?", user_id)
+
+    if request.method == "POST":
+
+        expense_name = request.form.get("ExpenseName")
+        expense_desc = request.form.get("ExpenseDescription")
+
+        if not expense_name:
+            flash(u'Must provide an Expense Name', 'error')
+            return redirect("add_expense")
+
+        timestamp = time.time()
+        date_time = datetime.fromtimestamp(timestamp)
+        
+        # if description is not null:
+        if expense_desc is not None:
+            prim_key = db.execute("INSERT INTO expenses (day_added, name, description, user_id) VALUES (:day_added, :name, :description, :user_id)",
+                                  day_added=date_time,
+                                  name=expense_name,
+                                  description=expense_desc,
+                                  user_id=user_id)
+
+            if prim_key is None:
+                flash("Registration error. Please contact support")
+                return redirect("/planning")
+                
+            flash(u'Expense  Added!')
+
+        elif not expense_desc:
+            prim_key = db.execute("INSERT INTO expenses (day_added, name, user_id) VALUES (:day_added, :name, :user_id)",
+                                  day_added=date_time,
+                                  name=expense_name,
+                                  user_id=user_id)
+
+            if prim_key is None:
+                flash("Registration error. Please contact support")
+                return redirect("/add_expense")   
+
+            flash(u'Expense  Added!')    
+
+        return redirect("/add_expense")
+
+    return render_template("add_expense.html", expenses=expenses)
+
 
 @app.route("/settings", methods=["GET", "POST"])
 @login_required
 def settings():
     
-    ##if request.method == "POST":
+    ## if request.method == "POST":
         
     user_id = session["user_id"]
 

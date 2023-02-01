@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add Expense
+{% endblock %}
+
+{% block main %}
+
+<a href="/planning">Back to planning</a><br><br>
+
+
+    <div class="add_expense container">
+        <br>
+        <h3>Add Expense</h3>
+        
+        <p>In this form you will be able to add a new expense to your registred expenses.</p>
+        
+        <form action="/add_expense" method="post">
+            <div class="form-group col-6 " style="margin:auto">
+              <label for="ExpenseName"><strong>Expense Name</strong></label>
+              <input autocomplete="off" type="text" class="form-control" name="ExpenseName" id="ExpenseName" placeholder="Rent">
+            </div><br>
+            <div class="form-group col-6" style="margin:auto">
+              <label for="ExpenseDescription"><strong>Description</strong> (Optional)</label>
+              <input autocomplete="off" type="text" class="form-control" name="ExpenseDescription" id="ExpenseDescription" placeholder="House on Park Ave. & 29th NYC.">
+            </div><br>
+            <div class="form-group col-6" style="margin:auto">
+                <label for="Past_Value"><strong>Last Value Recorded</strong></label>
+                <input readonly type="text" id="Past_Value" class="form-control" placeholder="Default: $ 00.00">
+            </div>
+            <br> <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
+        
+        <br><br>
+        
+    </div><br><br>
+
+            <h5>Here is the list of all your registred expenses</h5>
+
+    <main class="container py-5 text-center">
+
+        <table class="table table-striped">
+            <!--<colgroup>
+                <col class="" span="2" />
+                <col class="green" span="1" />
+            
+            </colgroup> -->  
+            <thead>
+                <tr>
+                    <th class="text-start">Expense ID</th>
+                    <th class="text-center">Date added</th>
+                    <th class="text-center"><strong>Name</strong></th>
+                    <th style="width:30%" class="text-center">Description</th>
+                    <th class="text-end">Last Value Recorded</th>
+                </tr>
+            </thead>
+           <tbody>
+                {% for expense in expenses %}
+                    <tr>
+                        <td class="text-start">{{ expense.id }}</td>
+                        <td class="text-center">{{ expense.day_added }}</td>
+                        <td class="text-center"><strong>{{ expense.name }}</strong></td>
+                        <td class="text-center">{{ expense.description }}</td>
+                        <td class="text-end">{{ expense.past_value }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+
+
+{% endblock %}
