@@ -31,75 +31,99 @@
             <input class="btn btn-primary" id ="year" type="button" value=" Year  ">
             <br><br>
         </div><br><br>
-        <div class="income " id="income">
+        <div class="income container" id="income">
             <br><h3>Expected Income</h3>
             <p>Please insert the income you expect to have over this period.  <br>You will be able to change it if it suffers modifications. 
-            <div class="input-group" >
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="">Currency and Income</span>
-                </div class="input-group">
-                    <select name="currency">
-                    <option disabled selected>Currency</option>
-                    {% for currency in currencies %}
-                        <option value="{{ currency }}">{{ currency }}</option>
-                    {% endfor %}
-                </select>
-                <input type="text" size="10" placeholder="00.00" size="50">
+            <div class="form-row expected_income" >
+                <div class="col">
+                    <select class="form-control">
+                        <option selected disabled>Currency</option>
+                        {% for currency in currencies %}
+                        <option>{{ currency }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <input class="form-control" type="text" placeholder="Income: 00.00">
+                </div>
             </div>
-            <br><br>
+            
+            <p>The currency you select here will be the same as on the expenses.</p>
+
+            <div>
+                <br>
+                <button class="btn btn-outline-success" type="submit">Submit Income</button>
+                <br>
+            </div>
+            <br>
             <h5 class="past-incomes">Past Incomes...</h5>
             <!-- to do insert past incomes-->
         </div>
+
         <br>
-        <div class="expenses_container" id="expenses">
-            <br><h3>Expected Expenses</h3>
-            <p>Please insert the expenses you expect to have over this period.  <br><br><p>If you don´t see an expense you want to use, , feel free to add one to your list <a href="/add_expense">here</a>.</p>
-            <h5>Add expenses to your planning</h5>
-            <a href="#" class="add">&plus;</a>
         
-            <div class="inp-group"></div>
+        <div style="margin:auto" id="expectedexpenses" class="expenses_container" id="expenses">
+            <br><h3>Expected Expenses</h3>
+            <p>Please insert the expenses you expect to have over this period.  <br><p>If you don´t see an expense you want to use, feel free to add one to your list <a href="/add_expense"><strong>here</strong></a>.</p>
+            <p class="table_title">Add expenses to your planning</p>
+            <a style="margin:auto" class="add btn btn-light">&plus;</a>
+            <br>
+            <div class="inp-group">
+                
+            </div>
+            <div>
+                <br>
+                <button class="btn btn-outline-success" type="submit">Submit expenses</button>
+                <br>
+            </div>
         </div>
         <script>
             const addBtn = document.querySelector(".add");
 
             const input = document.querySelector(".inp-group");
 
+            function removeInput() {
+                this.parentElement.remove();
+            }
+
             function addInput() {
-                const ExpenseName = document.createElement("input");
-                ExpenseName.type="text";
-                Currency.placeholder="Expense name"
-
-                const Currency = document.createElement("input");
-                Currency.type="text";
-                Currency.placeholder="Currency"
-                
+                const ExpenseName = document.createElement("select");
+                ExpenseName.className = "form-control";
+                ExpenseName.type="select";
+                ExpenseName.placeholder="Expense name";
+                ExpenseName.options = "Hola";
+  
                 const Amount = document.createElement("input");
+                Amount.className = "form-control";
                 Amount.type="integer";
-                Amount.placeholder="00.00"
+                Amount.placeholder="Amount: 00.00";
 
-                const AddExpense = document.createElement("input");
+                const AddExpense = document.createElement("button");
+                AddExpense.className = "btn btn-outline-primary";
+                AddExpense.type="submit";
                 
                 const btn = document.createElement("a");
-                btn.className = "delete";
+                btn.className = "btn btn-danger";
                 btn.innerHTML = "&times";
+
+                btn.addEventListener("click", removeInput);
 
                 const flex = document.createElement("div");
                 flex.className = "flex";
                 
                 input.appendChild(flex);
                 flex.appendChild(ExpenseName);
-                flex.appendChild(Currency);
                 flex.appendChild(Amount);
                 flex.appendChild(AddExpense);
                 flex.appendChild(btn);
 
-
             }
             addBtn.addEventListener("click", addInput);
+
 
         </script>
     </form>
 
 
-
+ 
 {% endblock %}

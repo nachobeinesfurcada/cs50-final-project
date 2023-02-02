@@ -44,6 +44,23 @@ a.button {
 
 .period {
     background-color: rgb(224, 224, 224);
+    margin:auto;
+    max-width: 800px;
+    border-radius: 10px;
+    width: auto;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 2px 3px rgba(0,0,0,0.1);
+}
+
+.expected_income {
+    background-color: azure;
+    margin:auto;
+    max-width: 800px;
+    border-radius: 10px;
+    width: 300px;
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
 .expenses {
@@ -83,9 +100,10 @@ form {
 .flex {
     display: flex;
     gap: 1.5em;
+    margin-bottom: 15px;
 
 }
-.delete {
+.add {
     text-decoration: none;
     display: inline-block;
     background:rgb(167, 167, 167);
@@ -100,4 +118,45 @@ form {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+}
+
+.input {
+    padding: 5px 10px;
+    background:#eee;
+    border: none;
+    width: 50%;
+
+}
+
+.delete {
+    text-decoration: none;
+    display: inline-block;
+    background:rgb(254, 164, 164);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight:bold;
+    width: 30px;
+    height: 30px;
+    color: #fff;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.inp-group {
+    margin:auto;
+    max-width: 800px;
+    background: rgb(116, 167, 255);
+    border-radius: 10px;
+    width: auto;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 2px 3px rgba(0,0,0,0.1);
+}
+
+.table_title {
+    font-size: 23px;
+    font-weight: 500;
 }

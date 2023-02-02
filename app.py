@@ -262,7 +262,7 @@ def register():
 
         if prim_key is None:
             flash(u'Registration error', 'error')
-
+            
         # remember user session
         session["user_id"] = prim_key
 
