@@ -5,9 +5,10 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
-
+import pandas as pd
 import time
-from datetime import datetime
+from datetime import date, datetime, timedelta
+
 
 from extras import login_required
 
@@ -28,6 +29,7 @@ expertise = ["Begginer", "Intermediate", "Expert"]
 
 currencies = ["ARS","REAL", "USD"]
 
+days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 @app.after_request
 def after_request(response):
@@ -134,21 +136,59 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-@app.route("/planning", methods=["GET", "POST"])
+
+
+@app.route("/new_plan", methods=["GET", "POST"])
 @login_required
-def planning():
+def new_plan():
         
     # get user id to pass as a list to html 
     user_id = session["user_id"]
     name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
     
     expenses = db.execute("SELECT * FROM expenses WHERE user_id = ?", user_id)
-
+    
+    now = datetime.now()
+    
     if request.method == "POST":
     
-        return redirect("/")
+        # PERIOD DEFINITION
+        if request.form.get("day"):
+            # calculate today and send it to template
+            period = now.strftime("%A %d, %b of %Y")
+            return render_template("new_plan.html", period=period, name=name)
 
-    return render_template("planning.html", name=name, currencies=currencies, expenses=expenses) 
+        if request.form.get("month"):
+            # calculate 1 month from today and send it to template
+            this_month = now.strftime("%Y-%m-%d")
+            next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=1)).strftime("%Y-%m-%d")
+            period = f"1 Month. \nFrom: {this_month} to {next_month}"
+            return render_template("new_plan.html", period=period, name=name)
+
+        if request.form.get("quarter"):
+            # calculate 3 months from today and send it to template
+            this_month = now.strftime("%Y-%m-%d")
+            next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=3)).strftime("%Y-%m-%d")
+            period = f"1 quarter. \nFrom: {this_month} to {next_month}"
+            return render_template("new_plan.html", period=period, name=name)
+
+        if request.form.get("year"):
+            # calculate 12 month from today and send it to template
+            this_month = now.strftime("%Y-%m-%d")
+            next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=12)).strftime("%Y-%m-%d")
+            period = f"1 year. \nFrom: {this_month} to {next_month}"
+            return render_template("new_plan.html", period=period, name=name)
+
+        # INCOME
+
+
+        currency = request.form.get("currency")
+        income = request.form.get("income")
+
+
+        return render_template("new_plan.html", name=name)
+
+    return render_template("new_plan.html", name=name, currencies=currencies, expenses=expenses) 
 
 @app.route("/add_expense", methods=["GET", "POST"])
 @login_required
@@ -181,7 +221,7 @@ def add_expense():
 
             if prim_key is None:
                 flash("Registration error. Please contact support")
-                return redirect("/planning")
+                return redirect("/new_plan")
                 
             flash(u'Expense  Added!')
 
