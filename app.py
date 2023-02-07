@@ -1,3 +1,6 @@
+# KISS
+# HOT RELOADING FLASK export FLASK_ENV=development
+# HOT RELOADING FLASK export FLASK_APP=app
 import os
 
 from cs50 import SQL
@@ -5,12 +8,15 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
+
 import pandas as pd
 import time
 from datetime import date, datetime, timedelta
 
-
 from extras import login_required
+
+# for API
+import requests
 
 # Configure application
 app = Flask(__name__)
@@ -30,6 +36,20 @@ expertise = ["Begginer", "Intermediate", "Expert"]
 currencies = ["ARS","REAL", "USD"]
 
 days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+
+# API for Dolar Blue
+URL = 'https://www.dolarsi.com/api/api.php?type=valoresprincipales'
+json = requests.get(URL).json()
+
+BLUE_COMPRA = 0
+BLUE_VENTA = 0 
+
+for index, name in range(1):
+    BLUE_COMPRA = json[index]['casa']['compra']
+    BLUE_VENTA = json[index]['casa']['venta']
+
+
+
 
 @app.after_request
 def after_request(response):
@@ -140,6 +160,7 @@ def logout():
 
 @app.route("/new_plan", methods=["GET", "POST"])
 @login_required
+
 def new_plan():
         
     # get user id to pass as a list to html 
@@ -149,7 +170,7 @@ def new_plan():
     expenses = db.execute("SELECT * FROM expenses WHERE user_id = ?", user_id)
     
     now = datetime.now()
-    
+
     if request.method == "POST":
     
         # PERIOD DEFINITION
@@ -180,15 +201,16 @@ def new_plan():
             return render_template("new_plan.html", period=period, name=name)
 
         # INCOME
-
-
         currency = request.form.get("currency")
         income = request.form.get("income")
 
+        if currency == currencies[2]:
+            # convert to usd using an API
+            pesos_to_usd = income * venta
 
         return render_template("new_plan.html", name=name)
 
-    return render_template("new_plan.html", name=name, currencies=currencies, expenses=expenses) 
+    return render_template("new_plan.html", name=name, currencies=currencies, expenses=expenses, compra=compra, venta=venta) 
 
 @app.route("/add_expense", methods=["GET", "POST"])
 @login_required

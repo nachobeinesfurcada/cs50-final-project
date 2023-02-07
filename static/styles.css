@@ -192,3 +192,12 @@ form {
     font-size: 35px;
     color:#ffc23e
 }
+
+.usd_values{
+
+    background-color: #c8ffe3;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    height: 25px;
+}

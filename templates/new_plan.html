@@ -5,13 +5,14 @@
 {% endblock %}
 
 {% block main %}
+
     <div>
         <h2 style="text-align:center">Welcome to your new Plan </h2>
         <p class="name" style="text-align:center" style="color:rgb(255, 168, 69)">{% for name in name %}{{ name.name }}{% endfor %}</p>
     </div>
 
     <br>
-    <div>
+    <div> 
         <h6 style="text-align:center">Here you will be able to make a plan for the period of your choice. <h6>
     </div>
     <br>
@@ -26,9 +27,9 @@
               <th style="width:33%">Total Expenses</th>
             </tr>
             <tr style="height:100px">
-                <td>{% block content %} {{ period }} {% endblock %}</td>
-                <td>{% block content1 %} {{ a }} {% endblock %}</td>
-                <td>{% block content2 %} {{ b }} {% endblock %}</td>
+                <td>{% block content3 %} {{ period }} {% endblock %}</td>
+                <td>{% block content4 %} {{ a }} {% endblock %}</td>
+                <td>{% block content5 %} {{ b }} {% endblock %}</td>
 
             </tr>
           </table>
@@ -55,8 +56,7 @@
         <div class="income container" id="income">
             <br><h3>Expected Income</h3>
             <p>Please insert the income you expect to have over this period.  <br>You will be able to change it if it suffers modifications. 
-            <p> <strong> Today´s date: {% block content3 %} {{ today }} {% endblock %}</strong></p>
-                <div class="form-row expected_income" >
+            <div class="form-row expected_income" >
                 <div class="col">
                     <select class="form-control name="currency">
                         <option selected disabled>Currency</option>

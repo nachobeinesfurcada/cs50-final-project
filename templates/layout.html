@@ -64,7 +64,10 @@
                 </div>
             </header>
         {% endif %}
-
+        <div class="usd_values">
+            <p> compra: {% block content1 %} {{ compra }} {% endblock %} 
+                venta:{% block content2 %} {{ venta }} {% endblock %}</p>
+        </div>
         <main class="container-fluid py-5 text-center">
             {% block main %}{% endblock %}
         </main>
