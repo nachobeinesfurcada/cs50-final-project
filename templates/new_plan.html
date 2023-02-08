@@ -1,0 +1,171 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block main %}
+    
+    <form action="/new_plan" method="post">       
+    <div>
+        <h2 style="text-align:center">Welcome to your new Plan </h2>
+        <p class="name" style="text-align:center" style="color:rgb(255, 168, 69)">{% for name in name %}{{ name.name }}{% endfor %}</p>
+    </div>
+
+    <br>
+    <div> 
+        <h6 style="text-align:center">Here you will be able to make a plan for the period of your choice. <h6>
+    </div>
+    <br>
+    <div class="summary">
+        <br><h2>Planning Summary</h2>
+        <br> <h6>Once you add things to your plan, they will apear here.</h6>
+        
+        <table class="summary_table text-center" style="width:90%">
+            <tr >
+              <th style="width:33%">Period</th>
+              <th style="width:33%">Total Income</th>
+              <th style="width:33%">Total Expenses</th>
+            </tr>
+            <tr style="height:100px">
+                <td>{% block content3 %} {{ period }} {% endblock %}</td>
+                <td></td>
+                <td><td>
+            </tr>
+          </table>
+          <br>
+    </div>
+    <br><br>
+    <a class="hyperlinks" href="#income">Income</a><a class="hyperlinks" href="#expenses">|           Expenses</a> 
+    <br><br>
+    
+        <div class="period container">
+            <br>
+            <h3>Period</h3>
+            <p>Please select the period you want to do some planning. </p>
+            <input onclick="period();" class="btn btn-primary" id="day" name="day" type="submit" value="Day">
+            <input onclick="period();" class="btn btn-primary" id="month" name="month" type="submit" value="Month">
+            <input onclick="period();" class="btn btn-primary" id="quarter" name="quarter" type="submit" value="Quarter">
+            <input onclick="period();" class="btn btn-primary" id="year" name="year" type="submit" value="Year">
+            <br><br>
+        </div><br><br>
+        <div class="income container" id="income">
+            <br><h3>Expected Income</h3>
+            <p>Please insert the income you expect to have over this period.  <br>You will be able to change it if it suffers modifications. 
+            <div class="form-row expected_income" >
+                <div class="col">
+                    <strong>Income name</strong>
+                    <input class="form-control" type="text" name="income_name" placeholder="Example: Salary"><br>
+                    <strong>Currency</strong>
+                    <select class="form-control" name="currency">
+                        <option selected disabled>Select option</option>
+                        {% for currency in currencies %}
+                        <option>{{ currency }}</option>
+                        {% endfor %}
+                    </select>
+                </div><br>
+                <div class="col">
+                    <strong>Income</strong> 
+                    <input class="form-control" type="text" name="income" placeholder="00.00">
+                </div>
+            </div>
+            
+            <p>The currency you select here will be the same as on the expenses.</p>
+
+            <div>
+                <br>
+                <button class="btn btn-outline-success" type="submit">Submit Income</button>
+                <br>
+            </div>
+            <br>
+            <h5 class="past-incomes">Past Incomes...</h5>
+            <table class="table table-striped grey">
+                <thead>
+                    <tr>
+                        <th class="text-start">Income Name</th>
+                        <th class="text-center">Day added</th>
+                        <th class="text-end">Past Income</th>
+                    </tr>
+                </thead>
+               <tbody>
+                    {% for income in incomes %}
+                        <tr>
+                            <td class="text-start">{{ income.name }}</td>
+                            <td class="text-center">{{ income.day_added }}</td>
+                            <td class="text-end">{{ income.currency }} {{ income.income }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <br>
+        
+        <div style="margin:auto" id="expenses" class="income container">
+            <br><h3>Expected Expenses</h3>
+            <p>Please insert the expenses you expect to have over this period.  <br><p>If you don´t see an expense you want to use, feel free to add one to your list <a href="/add_expense"><strong>here</strong></a>.</p>
+            <p class="table_title">Add expenses to your planning</p>
+            <a style="margin:auto" class="add btn btn-light">&plus;</a>
+            <br>
+            <div class="inp-group">
+                
+            </div>
+            <div>
+                <br>
+                <button class="btn btn-outline-success" type="submit">Submit expenses</button>
+                <br>
+            </div>
+            <br>
+        </div>
+        <script>
+            const addBtn = document.querySelector(".add");
+
+            const input = document.querySelector(".inp-group");
+
+
+            function removeInput() {
+                this.parentElement.remove();
+            }
+
+            function addInput() {
+                const ExpenseName = document.createElement("input");
+                ExpenseName.className = "form-control";
+                ExpenseName.type="text";
+                ExpenseName.placeholder="Expense name";
+  
+                const Amount = document.createElement("input");
+                Amount.className = "form-control";
+                Amount.type="integer";
+                Amount.placeholder="Amount: 00.00";
+
+                const AddExpense = document.createElement("button");
+                AddExpense.className = "btn btn-outline-primary";
+                AddExpense.type="submit";
+                
+                const btn = document.createElement("a");
+                btn.className = "btn btn-danger";
+                btn.innerHTML = "&times";
+
+                btn.addEventListener("click", removeInput);
+
+                const flex = document.createElement("div");
+                flex.className = "flex";
+                
+                input.appendChild(flex);
+                flex.appendChild(ExpenseName);
+                flex.appendChild(Amount);
+                flex.appendChild(AddExpense);
+                flex.appendChild(btn);
+
+            }
+            addBtn.addEventListener("click", addInput);
+
+            function period () {
+                var message = document.getElementById("period").value;
+                display_message.innerHTML= message;
+            }
+
+        </script>
+        
+    </form>
+{% endblock %}

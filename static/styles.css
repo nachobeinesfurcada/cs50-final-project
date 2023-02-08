@@ -24,17 +24,183 @@ a.button {
 
 
 
-.select {
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    font: normal 11px/22px Arial, Sans-Serif;
-    color: black;
-    border: 1px solid #ccc;
-  }
 
  /* Styling error flashes */
   .error {
     color: rgba(255, 214, 79, 0.623)
 }
 
+.income {
+    background-color: azure;
+}
+
+.past-incomes {
+    color:rgb(167, 167, 167)
+}
+
+.hyperlinks {
+    color:rgb(138, 138, 138)
+}
+
+.period {
+    background-color: rgb(224, 224, 224);
+    margin:auto;
+    max-width: 800px;
+    border-radius: 10px;
+    width: auto;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 2px 3px rgba(0,0,0,0.1);
+}
+
+.expected_income {
+    background-color: azure;
+    margin:auto;
+    max-width: 800px;
+    border-radius: 10px;
+    width: 300px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.expenses {
+    background-color: azure;
+}
+
+.add_expense {
+    background-color: rgba(193, 255, 86, 0.515);
+}
+
+.grey {
+    background-color: rgba(128,128,128,.25);
+  }
+  .green {
+    background-color: rgba(193, 255, 86, 0.515);
+  }
+
+.container {
+    text-align:center;
+
+    margin: 0 auto;
+    position: relative;
+}
+
+.child {
+
+    margin: auto;
+}
+form {
+    text-align: center;
+    align-items: center;
+  }
+
+
+
+/* dynamic class creation */
+.flex {
+    display: flex;
+    gap: 1.5em;
+    margin-bottom: 15px;
+
+}
+.add {
+    text-decoration: none;
+    display: inline-block;
+    background:rgb(167, 167, 167);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight:bold;
+    width: 30px;
+    height: 30px;
+    color: #fff;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.input {
+    padding: 5px 10px;
+    background:#eee;
+    border: none;
+    width: 50%;
+
+}
+
+.delete {
+    text-decoration: none;
+    display: inline-block;
+    background:rgb(254, 164, 164);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight:bold;
+    width: 30px;
+    height: 30px;
+    color: #fff;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.inp-group {
+    margin:auto;
+    max-width: 800px;
+    background: rgb(116, 167, 255);
+    border-radius: 10px;
+    width: auto;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 2px 3px rgba(0,0,0,0.1);
+}
+
+.table_title {
+    font-size: 23px;
+    font-weight: 500;
+}
+
+
+.summary {
+    background-color: rgb(195, 255, 235);
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+.summary_table {
+    margin: 10px auto;
+    position: relative;
+    padding: 15px;
+    font-size: 30px;
+
+
+}
+
+.summary.content {
+    font-size: 12px;
+}
+
+.period_button {
+    height: 15px;
+    width: 35px;
+
+}
+
+.name {
+    font-size: 35px;
+    color:#ffc23e
+}
+
+.usd_values{
+
+    background-color: #c8ffe3;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    height: 25px;
+}
+.grey {
+    background-color: rgb(232, 232, 232);
+}

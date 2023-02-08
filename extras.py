@@ -4,6 +4,8 @@ import urllib.parse
 from flask import redirect, render_template, request, session
 from functools import wraps
 
+
+
 def login_required(f):
     """
     Decorate routes to require login.
@@ -16,7 +18,19 @@ def login_required(f):
             return redirect("/login")
         return f(*args, **kwargs)
     return decorated_function
+"""
+def usd_value_API(self):
+    # API for Dolar Blue
+    URL = 'https://www.dolarsi.com/api/api.php?type=valoresprincipales'
+    json = requests.get(URL).json()
 
+    for index, emoji in enumerate(('🟢', '🔵')):
+        compra = json[index]['casa']['compra'][:-1]
+        venta = json[index]['casa']['venta'][:-1]
 
-
-# todo: api with 
+    return {
+        "compra": json[index]['casa']['compra'][:-1],
+        "venta": venta = json[index]['casa']['venta'][:-1]
+    } 
+    compra, venta
+"""

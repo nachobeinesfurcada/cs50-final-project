@@ -9,6 +9,7 @@
         <h3 style="text-align:center">Register</h3>
     </div>
     <br>
+    <div class="register_container">
     <form action="/register" method="post">
         <div class="mb-3">
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
@@ -19,7 +20,18 @@
         <div class="mb-3">
             <input class="form-control mx-auto w-auto" id="password" name="confirmation" placeholder="Repeat Password" type="password">
         </div>
-
+        <br><h5>What is your name?</h5><br>
+        <div class="mb-3">
+            <input class="form-control mx-auto w-auto" id="name" name="name" placeholder="Name" type="text">
+        </div>
+        <br><h5>What is your last name?</h5><br>
+        <div class="mb-3">
+            <input class="form-control mx-auto w-auto" id="lastname" name="lastname" placeholder="Last Name" type="text">
+        </div>
+        <br><h5>When where you born?</h5><br>
+        <div class="mb-3">
+            <input class="form-control mx-auto w-auto" type="date" name="birth"/>
+        </div>
         <ab>
             <br><h5>For what will you use this app?</h5><br>
             <select name="type_of_user">
@@ -43,6 +55,6 @@
         </ab> <br>
             
         <br> <button class="btn btn-primary" type="submit">Register</button>
-
     </form>
+    </div>
 {% endblock %}
