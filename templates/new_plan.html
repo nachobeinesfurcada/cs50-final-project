@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block main %}
-
+    
+    <form action="/new_plan" method="post">       
     <div>
         <h2 style="text-align:center">Welcome to your new Plan </h2>
         <p class="name" style="text-align:center" style="color:rgb(255, 168, 69)">{% for name in name %}{{ name.name }}{% endfor %}</p>
@@ -28,9 +29,8 @@
             </tr>
             <tr style="height:100px">
                 <td>{% block content3 %} {{ period }} {% endblock %}</td>
-                <td>{% block content4 %} {{ a }} {% endblock %}</td>
-                <td>{% block content5 %} {{ b }} {% endblock %}</td>
-
+                <td></td>
+                <td><td>
             </tr>
           </table>
           <br>
@@ -38,7 +38,7 @@
     <br><br>
     <a class="hyperlinks" href="#income">Income</a><a class="hyperlinks" href="#expenses">|           Expenses</a> 
     <br><br>
-    <form action="/planning" method="post">
+    
         <div class="period container">
             <br>
             <h3>Period</h3>
@@ -49,24 +49,24 @@
             <input onclick="period();" class="btn btn-primary" id="year" name="year" type="submit" value="Year">
             <br><br>
         </div><br><br>
-        <div>
-
-
-        </div>
         <div class="income container" id="income">
             <br><h3>Expected Income</h3>
             <p>Please insert the income you expect to have over this period.  <br>You will be able to change it if it suffers modifications. 
             <div class="form-row expected_income" >
                 <div class="col">
-                    <select class="form-control name="currency">
-                        <option selected disabled>Currency</option>
+                    <strong>Income name</strong>
+                    <input class="form-control" type="text" name="income_name" placeholder="Example: Salary"><br>
+                    <strong>Currency</strong>
+                    <select class="form-control" name="currency">
+                        <option selected disabled>Select option</option>
                         {% for currency in currencies %}
                         <option>{{ currency }}</option>
                         {% endfor %}
                     </select>
-                </div>
+                </div><br>
                 <div class="col">
-                    <input class="form-control" type="text" name="income" placeholder="Income: 00.00">
+                    <strong>Income</strong> 
+                    <input class="form-control" type="text" name="income" placeholder="00.00">
                 </div>
             </div>
             
@@ -79,9 +79,26 @@
             </div>
             <br>
             <h5 class="past-incomes">Past Incomes...</h5>
-            <!-- to do insert past incomes-->
+            <table class="table table-striped grey">
+                <thead>
+                    <tr>
+                        <th class="text-start">Income Name</th>
+                        <th class="text-center">Day added</th>
+                        <th class="text-end">Past Income</th>
+                    </tr>
+                </thead>
+               <tbody>
+                    {% for income in incomes %}
+                        <tr>
+                            <td class="text-start">{{ income.name }}</td>
+                            <td class="text-center">{{ income.day_added }}</td>
+                            <td class="text-end">{{ income.currency }} {{ income.income }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-
+        
         <br>
         
         <div style="margin:auto" id="expenses" class="income container">
@@ -149,5 +166,6 @@
             }
 
         </script>
+        
     </form>
 {% endblock %}
