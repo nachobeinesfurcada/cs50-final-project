@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add Expense
+{% endblock %}
+
+{% block main %}
+
+    <h2>Welcome to your Plans</h2><br>
+    <main class="container py-5 text-center">
+        
+        <table class="table table-striped">
+            <!--<colgroup>
+                <col class="" span="2" />
+                <col class="green" span="1" />
+            
+            </colgroup> -->  
+            <thead>
+                <tr>
+                    <th class="text-start">Plan ID</th>
+                    <th class="text-center">Date added</th>
+                    <th class="text-center">Name</th>
+                    <th class="text-center">Period</th>
+                    <th class="text-center">Total Income</th>
+                    <th class="text-center">Total Expense</th>
+                    <th class="text-end">Period Result</th>
+                </tr>
+            </thead>
+        <tbody>
+                {% for plan in plans %}
+                    <tr>
+                        <td class="text-start">{{ plan.id }}</td>
+                        <td class="text-center">{{ plan.date_added }}</td>
+                        <td class="text-center">{{ plan.name }}</td>
+                        <td class="text-center">{{ plan.period }}</td>
+                        <td class="text-center">{{ plan.total_income }}</td>
+                        <td class="text-center">{{ plan.total_expense }}</td>
+                        <td class="text-end">{{ plan.result }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </main>
+
+
+{% endblock %}

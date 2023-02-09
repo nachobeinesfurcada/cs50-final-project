@@ -36,6 +36,8 @@ currencies = ["ARS","REAL", "USD"]
 
 days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
+periods = ["Day", "Month", "Quarter", "Year"]
+
 """ IN DEVELOPMENT
 # API for Dolar Blue
 URL = 'https://www.dolarsi.com/api/api.php?type=valoresprincipales'
@@ -154,6 +156,15 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
+@app.route("/plans", methods=["GET", "POST"])
+@login_required
+def plans():
+    user_id = session["user_id"]
+    plans = db.execute("SELECT * FROM plans WHERE id = ?;", user_id)
+    
+
+        
+    return render_template("plans.html", plans=plans)
 
 
 @app.route("/new_plan", methods=["GET", "POST"])
@@ -165,7 +176,7 @@ def new_plan():
     name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
     
     # get list of expenses
-    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ?", user_id)
+    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? ORDER BY name ASC", user_id)
     
     #get time on real time
     now = datetime.now()
@@ -173,34 +184,46 @@ def new_plan():
     # get list of incomes
     incomes = db.execute("SELECT * FROM incomes WHERE user_id = ?", user_id)
     
-    if request.method == "POST":
+    # create plan ID by executing a query over plas and past ids
+    past_id = db.execute("SELECT id FROM plans WHERE user_id=? ORDER BY id DESC limit 1", user_id)
     
+    #checking if it´s the first plan for this user
+    if past_id:
+        index = past_id[0]
+        plan_id = index["id"] + 1
+    else: 
+        plan_id = 1
+
+    if request.method == "POST":
+        
+        PERIOD = 0
+        
         # PERIOD DEFINITION
         if request.form.get("day"):
             # calculate today and send it to template
-            period = now.strftime("%A %d, %b of %Y")
-            return render_template("new_plan.html", period=period, name=name, currencies=currencies)
+            PERIOD = now.strftime("%A %d, %b of %Y")
+            return render_template("new_plan.html", PERIOD=PERIOD, name=name, currencies=currencies)
 
         if request.form.get("month"):
             # calculate 1 month from today and send it to template
             this_month = now.strftime("%Y-%m-%d")
             next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=1)).strftime("%Y-%m-%d")
-            period = f"1 Month. \nFrom: {this_month} to {next_month}"
-            return render_template("new_plan.html", period=period, name=name,currencies=currencies)
+            PERIOD = f"1 Month. \nFrom: {this_month} to {next_month}"
+            return render_template("new_plan.html", PERIOD=PERIOD, name=name,currencies=currencies)
 
         if request.form.get("quarter"):
             # calculate 3 months from today and send it to template
             this_month = now.strftime("%Y-%m-%d")
             next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=3)).strftime("%Y-%m-%d")
-            period = f"1 quarter. \nFrom: {this_month} to {next_month}"
-            return render_template("new_plan.html", period=period, name=name,currencies=currencies)
+            PERIOD = f"1 quarter. \nFrom: {this_month} to {next_month}"
+            return render_template("new_plan.html", PERIOD=PERIOD, name=name,currencies=currencies)
 
         if request.form.get("year"):
             # calculate 12 month from today and send it to template
             this_month = now.strftime("%Y-%m-%d")
             next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=12)).strftime("%Y-%m-%d")
-            period = f"1 year. \nFrom: {this_month} to {next_month}"
-            return render_template("new_plan.html", period=period, name=name,currencies=currencies)
+            PERIOD = f"1 year. \nFrom: {this_month} to {next_month}"
+            return render_template("new_plan.html", PERIOD=PERIOD, name=name,currencies=currencies)
         
         # INCOME
         
@@ -208,9 +231,8 @@ def new_plan():
         income_name = request.form.get("income_name")
         currency = request.form.get("currency")
         income = request.form.get("income")
-                 
         
-
+        """
         # validate if all fields are filled out
         if income_name is None:
             flash("Please select a income name.")
@@ -223,7 +245,8 @@ def new_plan():
         if income is None:
             flash("Please insert an income amount.")
             return redirect("/new_plan")            
-
+        """
+        
         # prim_key to check for succesfull data entry 
         prim_key = db.execute("INSERT INTO incomes (day_added, name, user_id, income, currency) VALUES (:day_added, :name, :user_id, :income, :currency)",
                                 day_added=now,
@@ -237,10 +260,13 @@ def new_plan():
         else:
             flash("Income added!")
         
-            
-        return render_template("new_plan.html", name=name)
+        # EXPENSES
+
+        return render_template("new_plan.html", name=name,currencies=currencies, expenses=expenses,incomes=incomes, PERIOD=PERIOD)
         
-    return render_template("new_plan.html", name=name, currencies=currencies, expenses=expenses, incomes=incomes) 
+    return render_template("new_plan.html", name=name, currencies=currencies, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id) 
+
+
 
 @app.route("/add_expense", methods=["GET", "POST"])
 @login_required

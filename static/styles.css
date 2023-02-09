@@ -34,8 +34,8 @@ a.button {
     background-color: azure;
 }
 
-.past-incomes {
-    color:rgb(167, 167, 167)
+.incomes_expenses_on_this_plan {
+    color:rgb(42, 42, 42)
 }
 
 .hyperlinks {
@@ -45,7 +45,7 @@ a.button {
 .period {
     background-color: rgb(224, 224, 224);
     margin:auto;
-    max-width: 800px;
+    max-width: auto;
     border-radius: 10px;
     width: auto;
     padding: 20px;
@@ -79,10 +79,14 @@ a.button {
   }
 
 .container {
-    text-align:center;
-
-    margin: 0 auto;
-    position: relative;
+    background-color: rgb(228, 228, 228);
+    margin:auto;
+    max-width: auto;
+    border-radius: 10px;
+    width: auto;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 3px 4px rgba(0, 0, 0, 0.235);
 }
 
 .child {
@@ -204,3 +208,10 @@ form {
 .grey {
     background-color: rgb(232, 232, 232);
 }
+
+.period_selector {
+    align-items: center;
+    text-align: center;
+    max-width: 200px;
+}
+
