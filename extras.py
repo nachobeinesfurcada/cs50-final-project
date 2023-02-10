@@ -15,7 +15,6 @@ def MagerDicts(dict1, dict2):
 
 
 
-
 def login_required(f):
     """
     Decorate routes to require login.

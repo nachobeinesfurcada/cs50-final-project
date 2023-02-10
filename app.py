@@ -159,11 +159,10 @@ def PLAN():
 def plans():
 
     user_id = session["user_id"]
-    plans = db.execute("SELECT * FROM plans WHERE id = ?;", user_id)
+    plans = db.execute("SELECT * FROM plans WHERE user_id = ?;", user_id)
     
-
-        
     return render_template("plans.html", plans=plans)
+
 
 
 @app.route("/new_plan", methods=["GET", "POST"])
@@ -202,23 +201,23 @@ def new_plan():
         PERIOD = 0
         
         # PERIOD DEFINITION
-        if request.form.get("day"):
+        if request.form.get("periods") == "Day":
             # calculate today and send it to template
             PERIOD = now.strftime("%A %d, %b of %Y")
             
-        if request.form.get("month"):
+        if request.form.get("periods") == "Month":
             # calculate 1 month from today and send it to template
             this_month = now.strftime("%Y-%m-%d")
             next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=1)).strftime("%Y-%m-%d")
             PERIOD = f"1 Month. \nFrom: {this_month} to {next_month}"
 
-        if request.form.get("quarter"):
+        if request.form.get("periods") == "Quarter":
             # calculate 3 months from today and send it to template
             this_month = now.strftime("%Y-%m-%d")
             next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=3)).strftime("%Y-%m-%d")
             PERIOD = f"1 quarter. \nFrom: {this_month} to {next_month}"
             
-        if request.form.get("year"):
+        if request.form.get("periods") == "Year":
             # calculate 12 month from today and send it to template
             this_month = now.strftime("%Y-%m-%d")
             next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=12)).strftime("%Y-%m-%d")
@@ -232,35 +231,76 @@ def new_plan():
         # get input from income form
         income_name = request.form.get("income_name")
         currency = request.form.get("currency")
-        total_income = request.form.get("income")
+        income = request.form.get("income")
+
+        total_income = 0
+        total_expenses = 0
+
+        # checking if income is none
+        if income:
+            total_income = int(income)
+        else:
+            total_income = 0
 
         # EXPENSES
 
         # get input from expense form
-        expense_name = request.form.get("expense_name1")
-        expense_name = request.form.get("expense_name2")
-        expense_name = request.form.get("expense_name3")
-        expense_name = request.form.get("expense_name4")
+        expense_name1 = request.form.get("expense_name1")
+        expense_name2 = request.form.get("expense_name2")
 
         expense1 = request.form.get("expense1")
         expense2 = request.form.get("expense2")
-        expense3 = request.form.get("expense3")
-        expense4 = request.form.get("expense4")
 
-        total_expenses = expense1 + expense2 + expense3 + expense4
-        
+        # Check which fields have values
+        if expense1:
+            total_expenses = total_expenses + int(expense1)
+            if expense2:
+                total_expenses = total_expenses + int(expense2)
+        elif expense2:
+            total_expenses = total_expenses + int(expense2)
+
+
         # Calculate Result
-        result = total_income - total_expense
+        result = total_income - total_expenses
 
+
+        # DATABASE INSERTS
+
+        # insert income into incomes table
+        db.execute("INSERT INTO incomes (day_added, name, user_id, currency, income, plan_id) VALUES (:day_added, :name, :user_id, :currency, :income, :plan_id)",
+                    day_added=now,
+                    name=expense_name1,
+                    user_id=user_id,
+                    currency=currency,
+                    income=total_income,
+                    plan_id=plan_id) 
+        
+        # insert expense 1 into expenses table
+        if expense1:  
+            db.execute("INSERT INTO expenses (day_added, name, user_id, plan_id, expense) VALUES (:day_added, :name, :user_id, :plan_id, :expense)",
+                        day_added=now,
+                        name=expense_name1,
+                        user_id=user_id,
+                        plan_id=plan_id,
+                        expense=expense1) 
+        
+        if expense2:
+            # insert expense 2 into expenses table
+            db.execute("INSERT INTO expenses (day_added, name, user_id, plan_id, expense) VALUES (:day_added, :name, :user_id, :plan_id, :expense)",
+                        day_added=now,
+                        name=expense_name2,
+                        user_id=user_id,
+                        plan_id=plan_id,
+                        expense=expense2)               
 
         #insert into database new plan
-        prim_key = db.execute("INSERT INTO plans (id, day_added, name, period, total_income, total_expense, result, user_id) ) VALUES (:id, :day_added, :name, :period, :total_income, :total_expense, :result, :user_id",
+        prim_key = db.execute("INSERT INTO plans (id, day_added, name, period, total_income, total_expense, result, user_id) VALUES (:id, :day_added, :name, :period, :total_income, :total_expense, :result, :user_id)",
                                 id=plan_id,
                                 day_added=now,
                                 name=plan_name,
                                 period=PERIOD,
                                 total_income=total_income,
-                                total_expense=total_expense,
+                                total_expense=total_expenses,
                                 result=result,
                                 user_id=user_id)
 
@@ -269,12 +309,12 @@ def new_plan():
             flash("Error. Please contact support")
             return redirect("/new_plan")
         else:
-            flash("Plan added!")   
+            flash("Plan added! Chek out your plans on the Plans Page.")   
 
+        
+        return render_template("index.html", expense1=expense1)
 
-        return redirect("/")
-
-    return render_template("new_plan.html", name=name, currencies=currencies, types_of_expenses=types_of_expenses, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id) 
+    return render_template("new_plan.html", name=name, currencies=currencies, types_of_expenses=types_of_expenses, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id, ) 
 
 
 
@@ -426,7 +466,7 @@ def add_expense():
     user_id = session["user_id"]
     name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
     
-    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ?", user_id)
+    types_of_expenses = db.execute("SELECT * FROM types_of_expenses WHERE user_id = ?", user_id)
 
     if request.method == "POST":
 
@@ -442,7 +482,7 @@ def add_expense():
         
         # if description is not null:
         if expense_desc is not None:
-            prim_key = db.execute("INSERT INTO expenses (day_added, name, description, user_id) VALUES (:day_added, :name, :description, :user_id)",
+            prim_key = db.execute("INSERT INTO types_of_expenses (day_added, name, description, user_id) VALUES (:day_added, :name, :description, :user_id)",
                                   day_added=date_time,
                                   name=expense_name,
                                   description=expense_desc,
@@ -455,7 +495,7 @@ def add_expense():
             flash(u'Expense  Added!')
 
         elif not expense_desc:
-            prim_key = db.execute("INSERT INTO expenses (day_added, name, user_id) VALUES (:day_added, :name, :user_id)",
+            prim_key = db.execute("INSERT INTO types_of_expenses (day_added, name, user_id) VALUES (:day_added, :name, :user_id)",
                                   day_added=date_time,
                                   name=expense_name,
                                   user_id=user_id)
@@ -468,7 +508,7 @@ def add_expense():
 
         return redirect("/add_expense")
 
-    return render_template("add_expense.html", expenses=expenses)
+    return render_template("add_expense.html", types_of_expenses=types_of_expenses)
 
 
 @app.route("/settings", methods=["GET", "POST"])
