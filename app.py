@@ -164,11 +164,18 @@ def edit_plan(plan_id):
     user_id = session["user_id"]
     plans = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?;", user_id, plan_id)
 
+    #get time on real time
+    now = datetime.now()
+
+    # Indexing all values to single variables for easier treatement with form an database
+
     index = plans[0]
     plan_name = index["name"]
-    
     PERIOD = index["period"]
-    
+    total_income = index["total_income"]
+    total_expense = index["total_expense"]
+    result = index["result"]
+
     # get list of incomeson this plan
     incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, plan_id)
     
@@ -181,15 +188,113 @@ def edit_plan(plan_id):
 
     if request.method == "POST":
         
+        # GET PLAN NAME
+        new_plan_name = request.form.get("plan_name")
         
+        # GET INCOMES
+        income_name = request.form.get("income_name")
+        currency = request.form.get("currency")
+        income = request.form.get("income") 
+        income_to_delete = request.form.get("income_to_delete")
+
+        rows = db.execute("SELECT * FROM incomes WHERE user_id = :user_id AND plan_id = :plan_id AND name = :name",
+                            user_id=user_id,
+                            plan_id=plan_id,
+                            name=income_name)
+
+        # Ensure income name not taken
+        if len(rows) != 0:
+            flash(u'Please provide other Income Name. This name has already been taken', 'error')
+            
+        # GET EXPENSES
+        expense_name = request.form.get("expense_name")
+        expense = request.form.get("expense")
+        expense_to_delete = request.form.get("expense_to_delete")
 
 
-        return redirect("/plans")
+        if new_plan_name != plan_name:
+            db.execute('UPDATE plans SET name=:new_plan_name WHERE user_id = :user_id AND id = :plan_id', 
+                        new_plan_name=new_plan_name, user_id=user_id, plan_id=plan_id)
+            flash("Name Update succesfully")
+
+
+        # Add new income to plan 
+        if income_name and income:
+            # INSERT incomes database with this plans id
+            db.execute("INSERT INTO incomes (day_added, name, user_id, currency, income, plan_id) VALUES (:day_added, :name, :user_id, :currency, :income, :plan_id)",
+                day_added=now,
+                name=income_name,
+                user_id=user_id,
+                currency=currency,
+                income=income,
+                plan_id=plan_id) 
+
+            # update plans database with this plans id
+            total_income = int(total_income) + int(income)
+            result = int(result) + int(total_income)
+
+            db.execute("UPDATE plans SET total_income=:total_income, result=:result WHERE user_id = :user_id AND id = :plan_id",
+                        total_income=total_income,
+                        result=result,
+                        user_id=user_id,
+                        plan_id=plan_id)
+            flash("Income Added Successfully! Plan result and Total Income updated.")
+        elif income is None:
+            flash("Please fill out income field.")
+        elif income_name is None:
+            flash("Please fill out income name field.")
+        elif plan_name is None and expense_name is None and expense is None:
+            flash("Please fill out all fields")
+
+        # Delete income from plan 
+        if income_to_delete:
+            amount_income_to_delete = db.execute("SELECT income FROM incomes WHERE name =:income_to_delete AND user_id = :user_id AND plan_id = :plan_id",
+                                                income_to_delete=income_to_delete,
+                                                user_id=user_id,
+                                                plan_id=plan_id)
+
+            index = amount_income_to_delete[0]
+            total_income = total_income - int(index["income"])
+
+            # delete from table
+            db.execute('DELETE FROM incomes WHERE name=:income_to_delete', 
+                        income_to_delete=income_to_delete)
+            
+            # update total income on plans table
+            db.execute('UPDATE plans SET total_income = :total_income WHERE user_id=:user_id AND id=:plan_id',
+                        total_income=total_income,
+                        user_id=user_id,
+                        plan_id=plan_id)
+
+            flash("Income Deleted Successfully")
+
+
+        # Add expense to plan
+
+        if expense_name and expense:
+            # INSERT incomes database with this plans id
+            db.execute("INSERT INTO expenses (day_added, name, user_id, expense, plan_id) VALUES (:day_added, :name, :user_id, :expense, :plan_id)",
+                day_added=now,
+                name=expense_name,
+                user_id=user_id,
+                expense=expense,
+                plan_id=plan_id) 
+            flash("Expense Added Successfully")
+            
+
+        # TO DO SAME AS INCOME BUT WITH EXPENSES
+
+        # TO DO ADD EDIT BUTTONS (UPDATE QUERIES)
+
+
+
+        return redirect(request.url)
 
     return render_template("edit_plan.html", plans=plans, plan_name=plan_name, 
                                             plan_id=plan_id, PERIOD=PERIOD, 
                                             expenses=expenses, types_of_expenses=types_of_expenses,
-                                            currencies=currencies)
+                                            currencies=currencies, incomes=incomes, total_income=total_income,
+                                            total_expense=total_expense)
 
 
 
@@ -261,8 +366,10 @@ def new_plan():
         currency = request.form.get("currency")
         income = request.form.get("income")
 
+        
+
         total_income = 0
-        total_expenses = 0
+        total_expense = 0
 
         # checking if income is none
         if income:
@@ -281,15 +388,15 @@ def new_plan():
 
         # Check which fields have values
         if expense1:
-            total_expenses = total_expenses + int(expense1)
+            total_expense = total_expense + int(expense1)
             if expense2:
-                total_expenses = total_expenses + int(expense2)
+                total_expense = total_expense + int(expense2)
         elif expense2:
-            total_expenses = total_expenses + int(expense2)
+            total_expense = total_expense + int(expense2)
 
 
         # Calculate Result
-        result = total_income - total_expenses
+        result = total_income - total_expense
 
 
         # DATABASE INSERTS
@@ -297,7 +404,7 @@ def new_plan():
         # insert income into incomes table
         db.execute("INSERT INTO incomes (day_added, name, user_id, currency, income, plan_id) VALUES (:day_added, :name, :user_id, :currency, :income, :plan_id)",
                     day_added=now,
-                    name=expense_name1,
+                    name=income_name,
                     user_id=user_id,
                     currency=currency,
                     income=total_income,
@@ -328,7 +435,7 @@ def new_plan():
                                 name=plan_name,
                                 period=PERIOD,
                                 total_income=total_income,
-                                total_expense=total_expenses,
+                                total_expense=total_expense,
                                 result=result,
                                 user_id=user_id)
 

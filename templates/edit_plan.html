@@ -13,7 +13,7 @@
 
 
         <div class="summary">
-            <br><h2>Plan Summary</h2><br>
+            <br><h2>Plan <a style="color:blue">{% block content8 %} {{ plan_name }} {% endblock %}</a> Summary</h2><br>
             <h4>Plan ID: {% block content1 %} {{ plan_id }} {% endblock %}</h4>
             <br>
             <table class="summary_table text-center" style="width:90%">
@@ -23,8 +23,8 @@
                 <th style="width:33%">Total Expenses</th>
                 </tr>
                 <tr style="height:100px">
-                    <td>{% block content3 %} {{ PERIOD }} {% endblock %}</td>
-                    <td></td>
+                    <td>{% block content3 %}{{ PERIOD }}{% endblock %}</td>
+                    <td>{% block content10 %}{{ total_income }}{% endblock %}</td>
                     <td><td>
                 </tr>
             </table>
@@ -33,17 +33,17 @@
         <hr>
 
 
-        <form>
+        <form action="/edit_plan/{% block content9 %} {{ plan_id }} {% endblock %}" method="post">
 
-            <div class="container">
+            <!-- PLAN NAME-->
+            <div class="container expected_income" >
                 <h3>Name of plan</h3>
-                <input class="form-control" type="text" name="plan_name" value="{% block content2 %} {{ plan_name }} {% endblock %}" required><br>
+                <input class="form-control" type="text" name="plan_name" value="{% block content2 %}{{ plan_name }}{% endblock %}" required><br>
+                <p><button class=" btn btn-primary" type="submit" >Change Name Plan</button></p>
             </div>
             
-            <br>
-            <hr>
-            <br>
-            <br>
+            <br><hr><br><br>            
+
 
             <!-- INCOMES -->
 
@@ -55,7 +55,7 @@
             <!-- ADD INCOME -->
             <div class="form-row expected_income" >
                 <div class="col">
-                    <h4>Add income</h4>
+                    <h4>Add Income</h4>
                     <strong>Income name</strong>
                     <input class="form-control" type="text" name="income_name" placeholder="Example: Salary"><br>
                     <strong>Currency</strong>
@@ -70,24 +70,27 @@
                     <strong>Income</strong> 
                     <input class="form-control" type="number" name="income" placeholder="00.00">
                 </div>
+                <br>
+                <p><button class=" btn btn-primary" type="submit" >Add Income</button></p>
             </div>
 
             <!-- DELETE INCOME -->
 
             <div class="form-row expected_income" >
                 <div class="col">
-                    <h4 >Delete An iNCOME</h4>
+                    <h4 >Delete an Income</h4>
                     <br>
                     <p>Please select the income you want to do delete </p>
-                    <select class="form-control form-row container" name="income_to_delete">
+                    <select class="form-control " name="income_to_delete">
                         <option selected disabled>Select income ></option>
                         {% for income in incomes %}
                         <option>{{ income.name }}</option>
                         {% endfor %}
                     </select>
                 </div>    
+                <br>
                 <div class="col">
-                    <button type="button" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
                 </div>    
             </div>
 
@@ -99,7 +102,7 @@
                     <tr>
                         <th class="text-start">Income Name</th>
                         <th class="text-center">Day added</th>
-                        <th class="text-end">Past Income</th>
+                        <th class="text-end">Income Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,13 +114,17 @@
                         </tr>
                     {% endfor %}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="text-end" colspan="2">Total:</td><td class="text-end">{% block content12 %}{{ total_income }}{% endblock %}</td>
+                    </tr>     
+                </tfoot>
             </table>
             </div>
             
 
-            <br>
-            <hr>
-            <br>
+            <br><hr><br>
+            
 
             <!-- EXPENSES -->
 
@@ -128,10 +135,10 @@
             <!-- ADD EXPENSE -->
             <div class="form-row expected_income" >
                 <div class="col">
-                    <h4>Add expense</h4>
+                    <h4>Add Expense</h4>
                     <strong>Expense name</strong>
                     <select class="form-control" name="expense_name">
-                        <option selected disabled>Select option</option>
+                        <option selected disabled>Select name ></option>
                         {% for expense_type in types_of_expenses %}
                         <option>{{ expense_type.name }}</option>
                         {% endfor %}
@@ -143,7 +150,7 @@
                     <input class="form-control" type="number" name="expense" placeholder="00.00">
                 </div>
                 <br>
-                <p><a class=" btn btn-primary" href="/add_expense/{% block content5 %} {{ plan_id }} {% endblock %}">Add Expense</a></p>
+                <p><button class=" btn btn-primary" type="submit" >Add Expense</button></p>
             </div>
             <br>
 
@@ -154,15 +161,16 @@
                     <h4 >Delete An Expense</h4>
                     <br>
                     <p>Please select the expense you want to do delete </p>
-                    <select class="form-control form-row container" name="expense_to_delete">
+                    <select class="form-control" name="expense_to_delete">
                         <option selected disabled>Select expense ></option>
                         {% for expense in expenses %}
-                        <option>{{ expense.name }}</option>
+                        <option>{{ expense.id }} - {{ expense.name }}</option>
                         {% endfor %}
                     </select>
                 </div>    
+                <br>
                 <div class="col">
-                    <button type="button" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger" >Delete</button>
                 </div>    
             </div>
             
@@ -178,8 +186,7 @@
                     <tr>
                         <th class="text-start">Expense Name</th>
                         <th class="text-center">Day added</th>
-                        <th class="text-center">Description</th>
-                        <th class="text-end">Past Income</th>
+                        <th class="text-end">Expense Amount</th>
                     </tr>
                 </thead>
                <tbody>
@@ -187,11 +194,15 @@
                         <tr>
                             <td class="text-start">{{ expense.name }}</td>
                             <td class="text-center">{{ expense.day_added }}</td>
-                            <td class="text-center">{{ expense.description }}</td>
-                            <td class="text-end">{{ expense.past_value }}</td>
+                            <td class="text-end">{{ expense.expense }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="text-end" colspan="2">Total:</td><td class="text-end">{% block content11 %}{{ total_expense }}{% endblock %}</td>
+                    </tr>     
+                </tfoot>
             </table>
 
 
