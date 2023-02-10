@@ -1,0 +1,212 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Edit Plan
+{% endblock %}
+
+{% block main %}
+
+
+    <main>
+        
+        <h2 style="color:red">Edit Plan</h2>
+
+
+        <div class="summary">
+            <br><h2>Plan Summary</h2><br>
+            <h4>Plan ID: {% block content1 %} {{ plan_id }} {% endblock %}</h4>
+            <br>
+            <table class="summary_table text-center" style="width:90%">
+                <tr >
+                <th style="width:33%">Period</th>
+                <th style="width:33%">Total Income</th>
+                <th style="width:33%">Total Expenses</th>
+                </tr>
+                <tr style="height:100px">
+                    <td>{% block content3 %} {{ PERIOD }} {% endblock %}</td>
+                    <td></td>
+                    <td><td>
+                </tr>
+            </table>
+            <br>
+        </div>
+        <hr>
+
+
+        <form>
+
+            <div class="container">
+                <h3>Name of plan</h3>
+                <input class="form-control" type="text" name="plan_name" value="{% block content2 %} {{ plan_name }} {% endblock %}" required><br>
+            </div>
+            
+            <br>
+            <hr>
+            <br>
+            <br>
+
+            <!-- INCOMES -->
+
+            <h2 class="incomes_expenses_on_this_plan">Incomes on this Plan</h2><br>
+            <p>Please fill out the following fields to add an expense. If you dont want to add one, dont. </p>
+            <p>If you don´t see an Expense you wish to add to the categories, you can add one <strong><a href="/add_expense">here</a></strong>.</p>
+            
+            
+            <!-- ADD INCOME -->
+            <div class="form-row expected_income" >
+                <div class="col">
+                    <h4>Add income</h4>
+                    <strong>Income name</strong>
+                    <input class="form-control" type="text" name="income_name" placeholder="Example: Salary"><br>
+                    <strong>Currency</strong>
+                    <select class="form-control" name="currency">
+                        <option selected disabled>Select option</option>
+                        {% for currency in currencies %}
+                        <option>{{ currency }}</option>
+                        {% endfor %}
+                    </select>
+                </div><br>
+                <div class="col">
+                    <strong>Income</strong> 
+                    <input class="form-control" type="number" name="income" placeholder="00.00">
+                </div>
+            </div>
+
+            <!-- DELETE INCOME -->
+
+            <div class="form-row expected_income" >
+                <div class="col">
+                    <h4 >Delete An iNCOME</h4>
+                    <br>
+                    <p>Please select the income you want to do delete </p>
+                    <select class="form-control form-row container" name="income_to_delete">
+                        <option selected disabled>Select income ></option>
+                        {% for income in incomes %}
+                        <option>{{ income.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>    
+                <div class="col">
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </div>    
+            </div>
+
+            <!-- LIST OF INCOMES-->
+
+            <h4>List of incomes</h4>
+            <table class="table table-striped grey">
+                <thead>
+                    <tr>
+                        <th class="text-start">Income Name</th>
+                        <th class="text-center">Day added</th>
+                        <th class="text-end">Past Income</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for income in incomes %}
+                        <tr>
+                            <td class="text-start">{{ income.name }}</td>
+                            <td class="text-center">{{ income.day_added }}</td>
+                            <td class="text-end">{{ income.currency }} {{ income.income }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            
+
+            <br>
+            <hr>
+            <br>
+
+            <!-- EXPENSES -->
+
+            <h2 class="incomes_expenses_on_this_plan">Expenses on this Plan</h2><br>
+            <p>Please fill out the following fields to add an expense. If you dont want to add one, dont. </p>
+            <p>If you don´t see an Expense you wish to add to the categories, you can add one <strong><a href="/add_expense">here</a></strong>.</p>
+            
+            <!-- ADD EXPENSE -->
+            <div class="form-row expected_income" >
+                <div class="col">
+                    <h4>Add expense</h4>
+                    <strong>Expense name</strong>
+                    <select class="form-control" name="expense_name">
+                        <option selected disabled>Select option</option>
+                        {% for expense_type in types_of_expenses %}
+                        <option>{{ expense_type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+                <div class="col">
+                    <strong>Expense</strong> 
+                    <input class="form-control" type="number" name="expense" placeholder="00.00">
+                </div>
+                <br>
+                <p><a class=" btn btn-primary" href="/add_expense/{% block content5 %} {{ plan_id }} {% endblock %}">Add Expense</a></p>
+            </div>
+            <br>
+
+            <!-- DELETE EXPENSE -->
+            
+            <div class="form-row expected_income" >
+                <div class="col">
+                    <h4 >Delete An Expense</h4>
+                    <br>
+                    <p>Please select the expense you want to do delete </p>
+                    <select class="form-control form-row container" name="expense_to_delete">
+                        <option selected disabled>Select expense ></option>
+                        {% for expense in expenses %}
+                        <option>{{ expense.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>    
+                <div class="col">
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </div>    
+            </div>
+            
+            
+            <br>
+            <hr>
+            <br>
+            
+            <!-- LIST OF EXPENSES -->
+            <h4>List of expenses</h4>
+            <table class="table table-striped grey">
+                <thead>
+                    <tr>
+                        <th class="text-start">Expense Name</th>
+                        <th class="text-center">Day added</th>
+                        <th class="text-center">Description</th>
+                        <th class="text-end">Past Income</th>
+                    </tr>
+                </thead>
+               <tbody>
+                    {% for expense in expenses %}
+                        <tr>
+                            <td class="text-start">{{ expense.name }}</td>
+                            <td class="text-center">{{ expense.day_added }}</td>
+                            <td class="text-center">{{ expense.description }}</td>
+                            <td class="text-end">{{ expense.past_value }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+
+
+
+
+
+        </form>
+
+
+
+
+    </main>
+
+
+
+{% endblock %}

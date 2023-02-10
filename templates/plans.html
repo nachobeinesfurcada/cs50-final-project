@@ -24,6 +24,9 @@
                     <th class="text-center">Total Income</th>
                     <th class="text-center">Total Expense</th>
                     <th class="text-end">Period Result</th>
+                    <th class="text-center">Edit</th>
+                    <th class="text-center">Copy</th>
+                    <th class="text-center">Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,11 +39,19 @@
                         <td class="text-center">{{ plan.total_income }}</td>
                         <td class="text-center">{{ plan.total_expense }}</td>
                         <td class="text-end">{{ plan.result }}</td>
-                    </tr>
+                        <td><a class="btn btn-info btn-xs un-extended" href="/edit_plan/{{plan.id}}">Edit</a></td>
+                        <td><a class="btn btn-info btn-xs un-extended" href="/copy_plan/{{plan.id}}">Copy</a></td>
+                        <td><a class="btn btn-info btn-xs un-extended" href="/delete_plan/{{plan.id}}">Delete</a></td>
                 {% endfor %}
             </tbody>
         </table>
-
+    <script>
+        $(document).ready(function(){
+            $('.editbtn').click(function(){
+                $(this).html($(this).html() == 'edit' ? 'modify' : 'edit');
+            });
+        });
+    </script>
     </main>
 
 

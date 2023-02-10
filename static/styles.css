@@ -54,10 +54,11 @@ a.button {
 }
 
 .expected_income {
-    background-color: azure;
+    background-color: rgb(221, 255, 255);
     margin:auto;
     max-width: 800px;
-    border-radius: 10px;
+
+    border-color: #929292;
     width: 300px;
     padding: 20px;
     margin-bottom: 20px;
@@ -167,7 +168,7 @@ form {
 
 
 .summary {
-    background-color: rgb(195, 255, 235);
+    background-color: rgba(207, 241, 255, 0.89);
     align-items: center;
     text-align: center;
     position: relative;

@@ -8,6 +8,7 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.datastructures import ImmutableMultiDict
 
 import pandas as pd
 import time
@@ -143,15 +144,6 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-@app.route("//", methods=["POST"])
-def PLAN():
-    try:
-        plan
-    except Exception as e:
-        print(e)
-    finally:
-        return redirect(request.referrer)
-
 
 
 @app.route("/plans", methods=["GET", "POST"])
@@ -162,6 +154,42 @@ def plans():
     plans = db.execute("SELECT * FROM plans WHERE user_id = ?;", user_id)
     
     return render_template("plans.html", plans=plans)
+
+
+
+@app.route("/edit_plan/<plan_id>", methods=["GET", "POST"])
+@login_required
+def edit_plan(plan_id):
+
+    user_id = session["user_id"]
+    plans = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?;", user_id, plan_id)
+
+    index = plans[0]
+    plan_name = index["name"]
+    
+    PERIOD = index["period"]
+    
+    # get list of incomeson this plan
+    incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, plan_id)
+    
+    # get list of expenses on this plan inner join types of expenses
+    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? AND plan_id=? ORDER BY name ASC", user_id, plan_id)
+
+    # get list of types of expenses for entering new 
+    types_of_expenses = db.execute("SELECT name FROM types_of_expenses WHERE user_id=?;", user_id)
+
+
+    if request.method == "POST":
+        
+        
+
+
+        return redirect("/plans")
+
+    return render_template("edit_plan.html", plans=plans, plan_name=plan_name, 
+                                            plan_id=plan_id, PERIOD=PERIOD, 
+                                            expenses=expenses, types_of_expenses=types_of_expenses,
+                                            currencies=currencies)
 
 
 
