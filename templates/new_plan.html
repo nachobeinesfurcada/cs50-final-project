@@ -17,6 +17,9 @@
         <h6 style="text-align:center">Here you will be able to make a plan for the period of your choice. <h6>
     </div>
     <br>
+
+
+    <hr>
     <div class="summary">
         <br><h2>Planning Summary</h2>
         <br> <h6>Once you add things to your plan, they will apear here.</h6><br>
@@ -35,10 +38,16 @@
           </table>
           <br>
     </div>
+    <hr>
+
+
     <br><br>
     <a class="hyperlinks" href="#income">Income</a><a class="hyperlinks" href="#expenses">|           Expenses</a> 
     <br><br>
-    
+        <div class="container">
+            <h3>Name of plan</h3>
+            <input class="form-control" type="text" name="plan_name" placeholder="Example: Monthly organization house Talar del Lago 497"><br>
+        </div>
         <div class="period container">
             <br>
             <h3>Period</h3>
@@ -49,8 +58,10 @@
                 <option>{{ period }}</option>
                 {% endfor %}
             </select>
-            <br><br>
-        </div><br><br>
+            
+        </div>
+        
+        
         <div class="income container" id="income">
             <br><h3>Expected Income</h3>
             <p>Please insert the income you expect to have over this period.  <br>You will be able to change it if it suffers modifications. 
@@ -101,28 +112,78 @@
             </table>
         </div>
         
-        <br>
         
         <div style="margin:auto" id="expenses" class="income container">
             <br><h3>Expected Expenses</h3>
             <p>Please insert the expenses you expect to have over this period.  <br>You will be able to change it if it suffers modifications. 
-            <div class="form-row expected_income" >
-                <div class="col">
-                    <strong>Expense name</strong>
-                    <select class="form-control" name="expense_name">
-                        <option selected disabled>Select option</option>
-                        {% for expense in expenses %}
-                        <option>{{ expense.name }}</option>
-                        {% endfor %}
-                    </select>
+            <p>If you don´t see an Expense you wish to add, you can add one <strong><a href="/add_expense">here</a></strong>.</p>
+                <div class="form-row expected_income" >
+                    <div class="col">
+                        <strong>Expense name 1</strong>
+                        <select class="form-control" name="expense_name1">
+                            <option selected disabled>Select option</option>
+                            {% for expense_type in types_of_expenses %}
+                            <option>{{ expense_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <br>
                 <div class="col">
                     <strong>Expense</strong> 
-                    <input class="form-control" type="text" name="expense" placeholder="00.00">
+                    <input class="form-control" type="text" name="expense1" placeholder="00.00">
                 </div>
-            </div>
-            
+                <br>
+                <div class="form-row expected_income" >
+                    <div class="col">
+                        <strong>Expense name 2</strong>
+                        <select class="form-control" name="expense_name2">
+                            <option selected disabled>Select option</option>
+                            {% for expense_type in types_of_expenses %}
+                            <option>{{ expense_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col">
+                    <strong>Expense</strong> 
+                    <input class="form-control" type="text" name="expense2" placeholder="00.00">
+                </div>
+                <br>
+                <div class="form-row expected_income" >
+                    <div class="col">
+                        <strong>Expense name 3</strong>
+                        <select class="form-control" name="expense_name3">
+                            <option selected disabled>Select option</option>
+                            {% for expense_type in types_of_expenses %}
+                            <option>{{ expense_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <strong>Expense</strong> 
+                    <input class="form-control" type="text" name="expense3" placeholder="00.00">
+                </div>
+                <br>
+                <div class="form-row expected_income" >
+                    <div class="col">
+                        <strong>Expense name 4</strong>
+                        <select class="form-control" name="expense_name4">
+                            <option selected disabled>Select option</option>
+                            {% for expense_type in types_of_expenses %}
+                            <option>{{ expense_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <strong>Expense</strong> 
+                    <input class="form-control" type="text" name="expense4" placeholder="00.00">
+                </div>
+                <br>
+                <p><strong>You will be able to add more expenses to this plan if you want to</strong></p>
+                        
             
             <!--<div>
                 <br>
@@ -158,6 +219,7 @@
             <br>
             <button class="btn btn-primary" type="submit">SUBMIT PLAN</button>
             <br>
+            <p>You will be able to make changes if you want to on the Plans page. </p>
         </div><br>
         <script>
             const addBtn = document.querySelector(".add");

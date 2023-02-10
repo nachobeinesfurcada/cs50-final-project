@@ -12,9 +12,9 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import pandas as pd
 import time
 from datetime import date, datetime, timedelta
-from extras import login_required
+from extras import login_required, MagerDicts
+#from forms import AddPlan
 
-# for API
 
 
 # Configure application
@@ -51,6 +51,11 @@ for index, name in range(1):
     BLUE_VENTA = json[index]['casa']['venta']
 """
 
+@app.route('/user_id/', defaults={'subject' : '/'})
+@app.route('/user_id/<user_id>')
+def subject(subject):
+    
+    return 'The value is: ' + subject
 
 @app.after_request
 def after_request(response):
@@ -61,25 +66,7 @@ def after_request(response):
     return response
 
 
-@app.route("/history")
-@login_required
-def history():
-    #Show history of transactions#
-    return render_template("history.html")
 
-@app.route("/taxes", methods=["GET", "POST"])
-@login_required
-def taxes():
-    if request.method == "GET":
-
-        # show list of taxes
-        user_id = session["user_id"]
-
-        taxes = db.execute("SELECT * FROM taxes_per_user WHERE user_id = ?", user_id)
-        
-        return render_template("taxes.html", taxes=taxes)
-
-    return render_template("new_tax.html") 
 
 @app.route("/new_tax", methods=["GET", "POST"])
 @login_required
@@ -156,9 +143,21 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
+@app.route("//", methods=["POST"])
+def PLAN():
+    try:
+        plan
+    except Exception as e:
+        print(e)
+    finally:
+        return redirect(request.referrer)
+
+
+
 @app.route("/plans", methods=["GET", "POST"])
 @login_required
 def plans():
+
     user_id = session["user_id"]
     plans = db.execute("SELECT * FROM plans WHERE id = ?;", user_id)
     
@@ -170,19 +169,10 @@ def plans():
 @app.route("/new_plan", methods=["GET", "POST"])
 @login_required
 def new_plan():
-        
+
     # get user id to pass as a list to html 
     user_id = session["user_id"]
     name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
-    
-    # get list of expenses
-    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? ORDER BY name ASC", user_id)
-    
-    #get time on real time
-    now = datetime.now()
-
-    # get list of incomes
-    incomes = db.execute("SELECT * FROM incomes WHERE user_id = ?", user_id)
     
     # create plan ID by executing a query over plas and past ids
     past_id = db.execute("SELECT id FROM plans WHERE user_id=? ORDER BY id DESC limit 1", user_id)
@@ -193,6 +183,131 @@ def new_plan():
         plan_id = index["id"] + 1
     else: 
         plan_id = 1
+
+    #get time on real time
+    now = datetime.now()
+
+    # get list of incomeson this plan
+    incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, plan_id)
+    
+    # get list of expenses on this plan inner join types of expenses
+    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? AND plan_id=? ORDER BY name ASC", user_id, plan_id)
+
+    # get list of types of expenses for entering new 
+    types_of_expenses = db.execute("SELECT name FROM types_of_expenses WHERE user_id=?;", user_id)
+
+        
+    if request.method == "POST":
+        
+        PERIOD = 0
+        
+        # PERIOD DEFINITION
+        if request.form.get("day"):
+            # calculate today and send it to template
+            PERIOD = now.strftime("%A %d, %b of %Y")
+            
+        if request.form.get("month"):
+            # calculate 1 month from today and send it to template
+            this_month = now.strftime("%Y-%m-%d")
+            next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=1)).strftime("%Y-%m-%d")
+            PERIOD = f"1 Month. \nFrom: {this_month} to {next_month}"
+
+        if request.form.get("quarter"):
+            # calculate 3 months from today and send it to template
+            this_month = now.strftime("%Y-%m-%d")
+            next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=3)).strftime("%Y-%m-%d")
+            PERIOD = f"1 quarter. \nFrom: {this_month} to {next_month}"
+            
+        if request.form.get("year"):
+            # calculate 12 month from today and send it to template
+            this_month = now.strftime("%Y-%m-%d")
+            next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=12)).strftime("%Y-%m-%d")
+            PERIOD = f"1 year. \nFrom: {this_month} to {next_month}"
+
+        # get plan name   
+        plan_name = request.form.get("plan_name")
+
+        # INCOME
+        
+        # get input from income form
+        income_name = request.form.get("income_name")
+        currency = request.form.get("currency")
+        total_income = request.form.get("income")
+
+        # EXPENSES
+
+        # get input from expense form
+        expense_name = request.form.get("expense_name1")
+        expense_name = request.form.get("expense_name2")
+        expense_name = request.form.get("expense_name3")
+        expense_name = request.form.get("expense_name4")
+
+        expense1 = request.form.get("expense1")
+        expense2 = request.form.get("expense2")
+        expense3 = request.form.get("expense3")
+        expense4 = request.form.get("expense4")
+
+        total_expenses = expense1 + expense2 + expense3 + expense4
+        
+        # Calculate Result
+        result = total_income - total_expense
+
+
+        #insert into database new plan
+        prim_key = db.execute("INSERT INTO plans (id, day_added, name, period, total_income, total_expense, result, user_id) ) VALUES (:id, :day_added, :name, :period, :total_income, :total_expense, :result, :user_id",
+                                id=plan_id,
+                                day_added=now,
+                                name=plan_name,
+                                period=PERIOD,
+                                total_income=total_income,
+                                total_expense=total_expense,
+                                result=result,
+                                user_id=user_id)
+
+        #Check for error in uploading into plans database
+        if prim_key is None:
+            flash("Error. Please contact support")
+            return redirect("/new_plan")
+        else:
+            flash("Plan added!")   
+
+
+        return redirect("/")
+
+    return render_template("new_plan.html", name=name, currencies=currencies, types_of_expenses=types_of_expenses, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id) 
+
+
+
+"""        
+@app.route("/new_plan", methods=["GET", "POST"])
+@login_required
+def new_plan():
+
+    #form = AddPlan(request.form)
+
+    # get user id to pass as a list to html 
+    user_id = session["user_id"]
+    name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
+    
+    # create plan ID by executing a query over plas and past ids
+    past_id = db.execute("SELECT id FROM plans WHERE user_id=? ORDER BY id DESC limit 1", user_id)
+    
+    #checking if it´s the first plan for this user
+    if past_id:
+        index = past_id[0]
+        plan_id = index["id"] + 1
+    else: 
+        plan_id = 1
+
+    #get time on real time
+    now = datetime.now()
+
+    # get list of incomes
+    incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, plan_id)
+    
+    # get list of expenses
+    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? AND plan_id=? ORDER BY name ASC", user_id, plan_id)
+
 
     if request.method == "POST":
         
@@ -227,12 +342,21 @@ def new_plan():
         
         # INCOME
         
-        # get input from form
+        # get input from income form
         income_name = request.form.get("income_name")
         currency = request.form.get("currency")
         income = request.form.get("income")
         
-        """
+
+        # validate if all fields are filled out
+
+
+        # TODO
+
+
+
+
+        ON DEVELOPMENT
         # validate if all fields are filled out
         if income_name is None:
             flash("Please select a income name.")
@@ -245,7 +369,7 @@ def new_plan():
         if income is None:
             flash("Please insert an income amount.")
             return redirect("/new_plan")            
-        """
+        
         
         # prim_key to check for succesfull data entry 
         prim_key = db.execute("INSERT INTO incomes (day_added, name, user_id, income, currency) VALUES (:day_added, :name, :user_id, :income, :currency)",
@@ -262,11 +386,38 @@ def new_plan():
         
         # EXPENSES
 
-        return render_template("new_plan.html", name=name,currencies=currencies, expenses=expenses,incomes=incomes, PERIOD=PERIOD)
+        # get input from expense form
+        expense_name = request.form.get("expense_name")
+        expense = request.form.get("expense")
+
+
+        # PLAN
+
+        plan = db.execute("SELECT id FROM plans WHERE user_id=? ORDER BY id DESC limit 1", user_id)
         
-    return render_template("new_plan.html", name=name, currencies=currencies, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id) 
+        #define a plan dictionary
+        DictItems = {plan_id:{"name":plan.name, "date":plan.day_added, 
+        "total_income":plan.total_income, "total_income":plan.total_income, 
+        "total_expense":plan.total_expense, "result":plan.result, "user_id":plan.user_id}}
+        
+        if "PlanSession" in session:
+            print(session["PlanSession"])
+            if plan_id in session["PlanSession"]:
+                print("This plan already exists.")
+            else:
+                session["PlanSession"] = MagerDicts(session["PlanSession"], DictItems)
+                return redirect(request.referrer)
+
+        else:
+            session["PlanSession"] = DictItems
+            return redirect(request.referrer)
 
 
+        return render_template("new_plan.html", name=name,currencies=currencies, expenses=expenses,incomes=incomes, PERIOD=PERIOD, plan_id=plan_id, form=form)
+        
+    return render_template("new_plan.html", name=name, currencies=currencies, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id, form=form) 
+
+"""
 
 @app.route("/add_expense", methods=["GET", "POST"])
 @login_required
@@ -406,3 +557,19 @@ def register():
 
     else:
         return render_template("register.html", type_of_user= type_of_user, expertise=expertise)
+
+@app.route("/taxes", methods=["GET", "POST"])
+@login_required
+def taxes():
+    if request.method == "GET":
+
+        # show list of taxes
+        user_id = session["user_id"]
+
+        taxes = db.execute("SELECT * FROM taxes_per_user WHERE user_id = ?", user_id)
+        
+        return render_template("taxes.html", taxes=taxes)
+
+    return render_template("new_tax.html") 
+
+
