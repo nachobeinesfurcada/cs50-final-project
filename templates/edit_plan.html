@@ -18,14 +18,16 @@
             <br>
             <table class="summary_table text-center" style="width:90%">
                 <tr >
-                <th style="width:33%">Period</th>
-                <th style="width:33%">Total Income</th>
-                <th style="width:33%">Total Expenses</th>
+                <th >Period</th>
+                <th >Total Income</th>
+                <th >Total Expenses</th>
+                <th class="text-end" style="width:25%">Result</th>
                 </tr>
                 <tr style="height:100px">
                     <td>{% block content3 %}{{ PERIOD }}{% endblock %}</td>
                     <td>{% block content10 %}{{ total_income }}{% endblock %}</td>
-                    <td><td>
+                    <td>{% block content13 %}{{ total_expense }}{% endblock %}<td>
+                    <td class="text-center">{% block content14 %}{{ result }}{% endblock %}<td>    
                 </tr>
             </table>
             <br>
@@ -164,7 +166,7 @@
                     <select class="form-control" name="expense_to_delete">
                         <option selected disabled>Select expense ></option>
                         {% for expense in expenses %}
-                        <option>{{ expense.id }} - {{ expense.name }}</option>
+                        <option>{{ expense.name }}</option>
                         {% endfor %}
                     </select>
                 </div>    

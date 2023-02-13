@@ -152,9 +152,90 @@ def plans():
 
     user_id = session["user_id"]
     plans = db.execute("SELECT * FROM plans WHERE user_id = ?;", user_id)
-    
+ 
     return render_template("plans.html", plans=plans)
 
+
+
+@app.route("/copy_plan/<plan_id>", methods=["GET", "POST"])
+@login_required
+def copy_plan(plan_id):
+
+    user_id = session["user_id"]
+    plans = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?;", user_id, plan_id)
+
+    #get time on real time
+    day_added = datetime.now()
+
+    # Indexing all values to single variables for easier treatement with forms and database
+    index = plans[0]
+    old_plan_id = plan_id
+    old_plan_name = index["name"]
+    old_PERIOD = index["period"]
+    old_total_income = index["total_income"]
+    old_total_expense = index["total_expense"]
+    old_result = index["result"]
+
+    # create new plan ID by executing a query over plans and past ids
+    
+    past_id = db.execute("SELECT id FROM plans WHERE user_id=? ORDER BY id DESC limit 1", user_id)
+    
+    index = past_id[0]
+    new_plan_id = index["id"] + 1
+
+
+    # get list of incomes of OLD plan
+    old_incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, old_plan_id)
+    
+    # get list of expenses of OLD plan inner join types of expenses
+    old_expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? AND plan_id=? ORDER BY name ASC", user_id, old_plan_id)
+
+    # get list of types of expenses for entering new 
+    types_of_expenses = db.execute("SELECT name FROM types_of_expenses WHERE user_id=?;", user_id)
+
+
+    # DATABASE INSERTS
+    new_plan_name = old_plan_name + "[1]"
+    # INSERT NEW PLAN INTO PLANS
+    db.execute("INSERT INTO plans (id, day_added, name, period, total_income, total_expense, result, user_id) VALUES (:new_plan_id, :day_added, :old_plan_name, :old_PERIOD, :old_total_income, :old_total_expense, :old_result, :user_id)",
+                new_plan_id=new_plan_id,
+                day_added=day_added,
+                old_plan_name=new_plan_name,
+                old_PERIOD=old_PERIOD,
+                old_total_income=old_total_income,
+                old_total_expense=old_total_expense,
+                old_result=old_result,
+                user_id=user_id)
+
+    # iterate over past incomes to INSERT INTO new incomes
+    for i in old_incomes:
+        curr_name = i["name"]
+        curr_currency = i["currency"]
+        curr_income = i["income"]
+
+        db.execute("INSERT INTO incomes (day_added, user_id, currency, income, plan_id, name) VALUES (:day_added, :user_id, :curr_currency, :curr_income, :new_plan_id, :curr_name)",
+                    day_added=day_added, 
+                    user_id=user_id, 
+                    curr_currency=curr_currency, 
+                    curr_income=curr_income, 
+                    new_plan_id=new_plan_id, 
+                    curr_name=curr_name)
+        
+    # iterate over past expenses to INSERT INTO new expenses
+    for i in old_expenses:
+        curr_name = i["name"]
+        curr_expense = i["expense"]
+
+        #insert into database new plan
+        db.execute("INSERT INTO expenses (day_added, user_id, plan_id, expense, name) VALUES (:day_added, :user_id, :curr_expense, :new_plan_id, :curr_name)",
+                    day_added=day_added, 
+                    user_id=user_id, 
+                    new_plan_id=new_plan_id,
+                    curr_expense=curr_expense, 
+                    curr_name=curr_name)
+
+    return render_template("copy_plan.html", new_plan_id=new_plan_id)
+    
 
 
 @app.route("/edit_plan/<plan_id>", methods=["GET", "POST"])
@@ -167,8 +248,7 @@ def edit_plan(plan_id):
     #get time on real time
     now = datetime.now()
 
-    # Indexing all values to single variables for easier treatement with form an database
-
+    # Indexing all values to single variables for easier treatement with forms and database
     index = plans[0]
     plan_name = index["name"]
     PERIOD = index["period"]
@@ -218,8 +298,14 @@ def edit_plan(plan_id):
             flash("Name Update succesfully")
 
 
-        # Add new income to plan 
+        # Add new INCOME to plan 
         if income_name and income:
+            
+            # update plans database with this plans id
+            total_income = int(total_income) + int(income)
+            result = int(result) + int(total_income)
+            
+            
             # INSERT incomes database with this plans id
             db.execute("INSERT INTO incomes (day_added, name, user_id, currency, income, plan_id) VALUES (:day_added, :name, :user_id, :currency, :income, :plan_id)",
                 day_added=now,
@@ -229,9 +315,6 @@ def edit_plan(plan_id):
                 income=income,
                 plan_id=plan_id) 
 
-            # update plans database with this plans id
-            total_income = int(total_income) + int(income)
-            result = int(result) + int(total_income)
 
             db.execute("UPDATE plans SET total_income=:total_income, result=:result WHERE user_id = :user_id AND id = :plan_id",
                         total_income=total_income,
@@ -239,6 +322,7 @@ def edit_plan(plan_id):
                         user_id=user_id,
                         plan_id=plan_id)
             flash("Income Added Successfully! Plan result and Total Income updated.")
+
         elif income is None:
             flash("Please fill out income field.")
         elif income_name is None:
@@ -269,23 +353,63 @@ def edit_plan(plan_id):
             flash("Income Deleted Successfully")
 
 
-        # Add expense to plan
 
+        # Add new EXPENSE to plan
         if expense_name and expense:
-            # INSERT incomes database with this plans id
+            
+            # update plans database with this plans id
+            total_expense = int(total_expense) + int(expense)
+            result = int(result) - int(total_expense)
+            
+            # INSERT expenses database with this plans id
+            
             db.execute("INSERT INTO expenses (day_added, name, user_id, expense, plan_id) VALUES (:day_added, :name, :user_id, :expense, :plan_id)",
                 day_added=now,
                 name=expense_name,
                 user_id=user_id,
                 expense=expense,
                 plan_id=plan_id) 
-            flash("Expense Added Successfully")
+
+            # update total expense on plans table
+            db.execute('UPDATE plans SET total_expense = :total_expense WHERE user_id=:user_id AND id=:plan_id',
+                        total_expense=total_expense,
+                        user_id=user_id,
+                        plan_id=plan_id)
+
+            flash("Expense Added Successfully! Plan result and Total Income updated.")
+
+        # Check for expense input fields 
+        elif expense is None:
+            flash("Please fill out expense field.")
+        elif income_name is None:
+            flash("Please fill out expense name field.")
+        elif plan_name is None and expense_name is None and expense is None:
+            flash("Please fill out all fields")
+        
+        # Delete expense from plan 
+        if expense_to_delete:
+            amount_expense_to_delete = db.execute("SELECT expense FROM expenses WHERE name = :expense_to_delete AND user_id=:user_id AND plan_id = :plan_id",
+                                                expense_to_delete=expense_to_delete,
+                                                user_id=user_id,
+                                                plan_id=plan_id)
+
+            index = amount_expense_to_delete[0]
+            total_expense = total_expense - int(index["expense"])
+
+            # delete from table
+            db.execute('DELETE FROM expenses WHERE name=:expense_to_delete', 
+                        expense_to_delete=expense_to_delete)
             
+            # update total expense on plans table
+            db.execute('UPDATE plans SET total_expense = :total_expense WHERE user_id=:user_id AND id=:plan_id',
+                        total_expense=total_expense,
+                        user_id=user_id,
+                        plan_id=plan_id)
 
-        # TO DO SAME AS INCOME BUT WITH EXPENSES
+            flash("Expense Deleted Successfully")
 
-        # TO DO ADD EDIT BUTTONS (UPDATE QUERIES)
 
+        # COPY BUTTONS
 
 
         return redirect(request.url)
@@ -294,7 +418,7 @@ def edit_plan(plan_id):
                                             plan_id=plan_id, PERIOD=PERIOD, 
                                             expenses=expenses, types_of_expenses=types_of_expenses,
                                             currencies=currencies, incomes=incomes, total_income=total_income,
-                                            total_expense=total_expense)
+                                            total_expense=total_expense, result=result)
 
 
 
@@ -319,7 +443,7 @@ def new_plan():
     #get time on real time
     now = datetime.now()
 
-    # get list of incomeson this plan
+    # get list of incomes on this plan
     incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, plan_id)
     
     # get list of expenses on this plan inner join types of expenses
