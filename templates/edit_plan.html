@@ -14,20 +14,20 @@
 
         <div class="summary">
             <br><h2>Plan <a style="color:blue">{% block content8 %} {{ plan_name }} {% endblock %}</a> Summary</h2><br>
-            <h4>Plan ID: {% block content1 %} {{ plan_id }} {% endblock %}</h4>
+            <h4>Plan ID: {% block content1 %} <a style="color:rgb(255, 122, 45)">{{ plan_id }}</a> {% endblock %}</h4>
             <br>
             <table class="summary_table text-center" style="width:90%">
-                <tr >
-                <th >Period</th>
-                <th >Total Income</th>
-                <th >Total Expenses</th>
-                <th class="text-end" style="width:25%">Result</th>
+                <tr>
+                    <th>Period</th>
+                    <th>Total Income</th>
+                    <th>Total Expenses</th>
+                    <th>Result</th>
                 </tr>
-                <tr style="height:100px">
+                <tr>
                     <td>{% block content3 %}{{ PERIOD }}{% endblock %}</td>
-                    <td>{% block content10 %}{{ total_income }}{% endblock %}</td>
-                    <td>{% block content13 %}{{ total_expense }}{% endblock %}<td>
-                    <td class="text-center">{% block content14 %}{{ result }}{% endblock %}<td>    
+                    <td>{% block content10 %}{{ total_income_format }}{% endblock %}</td>
+                    <td>{% block content13 %}{{ total_expense_format }}{% endblock %}</td>
+                    <td>{% block content14 %}{{ result_format }}{% endblock %}</td>    
                 </tr>
             </table>
             <br>
@@ -118,7 +118,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td class="text-end" colspan="2">Total:</td><td class="text-end">{% block content12 %}{{ total_income }}{% endblock %}</td>
+                        <td class="text-end" colspan="2">Total:</td><td class="text-end">{% block content12 %}{{ total_income_format }}{% endblock %}</td>
                     </tr>     
                 </tfoot>
             </table>
@@ -202,7 +202,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td class="text-end" colspan="2">Total:</td><td class="text-end">{% block content11 %}{{ total_expense }}{% endblock %}</td>
+                        <td class="text-end" colspan="2">Total:</td><td class="text-end">{% block content11 %}{{ total_expense_format }}{% endblock %}</td>
                     </tr>     
                 </tfoot>
             </table>

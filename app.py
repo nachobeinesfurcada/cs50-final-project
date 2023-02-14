@@ -12,10 +12,10 @@ from werkzeug.datastructures import ImmutableMultiDict
 
 import pandas as pd
 import time
-from datetime import date, datetime, timedelta
+import datetime
 from extras import login_required, MagerDicts
 
-import random
+import babel.numbers
 
 
 # Configure application
@@ -127,6 +127,9 @@ def index():
     user_id = session["user_id"] 
     name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
 
+    # todays date
+    today = datetime.date.today()
+
     # Get latest plan_id
     plan_id_index = db.execute("SELECT id FROM plans WHERE user_id = ? ORDER BY id DESC limit 1", user_id)
     index = plan_id_index[0]
@@ -136,34 +139,98 @@ def index():
     expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? AND plan_id=? ORDER BY day_added ASC", user_id, plan_id)
     plan = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?;", user_id, plan_id)
 
+    income_index = incomes[0]
+
     # creating variables for analysis
     result_over_weeks = 0
+    num_plans = 0
 
     #check if there is already a plan created
-    if plan[0] is not None: 
+    if plan is not None: 
 
+        plan_index = plan[0]
         # creating an index variable for easy treatment
-        if incomes[0] is not None:
+        if not incomes:
+            incomes = 0
+        else:
             income_index = incomes[0]
 
-        if expenses[0]  is not None:     
+        if not expenses:
+            expenses = 0
+        else:     
             expense_index = expenses[0]
         
-        if plan_income is not None:
-            plan_income = plan[0]
-
-        if plan_income["period"] == "Month":
+        if plan_index["period"] == "Month":
             
             #calculate result / 4 (for weekend expenses)
-            result_over_weeks = int(plan_income["result"]) / 4
+            result_over_weeks = int(plan_index["result"]) / 4
+
+        names = []
+        values = []
+        for row in incomes:
+            names.append(row[0])
+            values.append(row[1])
 
 
-    
+        # USER DATA
+
+        # number of plans
+        numplans = db.execute("SELECT count(id) as num_plans FROM plans WHERE user_id=?", user_id)
+        index = numplans[0]
+        num_plans = index["num_plans"]
+
+        # total income from beggining of year
+        this_year = today.year
+        ti = db.execute("SELECT sum(income) AS total_income FROM incomes WHERE user_id=? AND strftime('%Y',day_added) LIKE (select strftime('%Y','now'))", user_id)
+        index = ti[0]
+        total_income_from_this_year = index["total_income"]
+        total_income_from_this_year_formatted = babel.numbers.format_currency(total_income_from_this_year, '$', locale="en_US")
+
+        # total income from beggining of year
+        te = db.execute("SELECT sum(expense) AS total_expense FROM expenses WHERE user_id=? AND strftime('%Y',day_added) LIKE (select strftime('%Y','now'))", user_id)
+        index = te[0]
+        total_expense_from_this_year = index["total_expense"]
+        total_expense_from_this_year_formatted = babel.numbers.format_currency(total_expense_from_this_year, '$', locale="en_US")
+
+        # percentage of result over income total for this year PER PLAN
+        tir = db.execute("SELECT sum(total_income) as total_income FROM plans WHERE user_id=? AND strftime('%Y',day_added) LIKE (select strftime('%Y','now'))", user_id)
+        index = tir[0]
+        total_income_results = index["total_income"]
+
+        tr = db.execute("SELECT sum(result) as result FROM plans WHERE user_id=? AND strftime('%Y',day_added) LIKE (select strftime('%Y','now'))", user_id)
+        index = tr[0]
+        total_results = index["result"]    
+
+        percecentage_tr_over_ti = (int(total_results) * 100 / int(total_income_results)) / num_plans
+        formated_perc = "{:.0%}". format(percecentage_tr_over_ti)
+
+        # total types of expenses
+        total_toe = db.execute("SELECT count(id) as toe FROM types_of_expenses WHERE user_id = ? AND strftime('%Y',day_added) LIKE (select strftime('%Y','now'))", user_id)
+        index = total_toe[0]
+        total_types_of_expenses = index["toe"]
+
+        # average of income per plan
+        average_total_income_per_plan = int(total_income_results) / int(num_plans)
+        average_total_income_per_plan_f = babel.numbers.format_currency(average_total_income_per_plan, '$', locale="en_US")
+
+        # average expense per plan
+        te = db.execute("SELECT sum(expense) as total_expense FROM expenses WHERE user_id=? AND strftime('%Y',day_added) LIKE (select strftime('%Y','now'))", user_id)
+        index = te[0]
+        total_expenses = index["total_expense"]
+        average_total_expense_per_plan = int(total_expenses) / int(num_plans)
+        average_total_expense_per_plan_f = babel.numbers.format_currency(average_total_expense_per_plan, '$', locale="en_US")
 
 
 
 
-    return render_template("index.html", name=name, incomes=incomes, result_over_weeks=result_over_weeks)
+    return render_template("index.html", name=name, incomes=incomes, result_over_weeks=result_over_weeks,
+                             num_plans=num_plans, this_year=this_year, plan_id=plan_id,
+                             total_income_from_this_year_formatted=total_income_from_this_year_formatted,
+                             total_expense_from_this_year_formatted=total_expense_from_this_year_formatted,
+                             formated_perc=formated_perc, total_types_of_expenses=total_types_of_expenses,
+                             average_total_income_per_plan_f=average_total_income_per_plan_f,
+                             average_total_expense_per_plan_f=average_total_expense_per_plan_f,
+                             income_index=income_index, values=values, names=names)
 
 
 @app.route("/logout")
@@ -184,7 +251,7 @@ def logout():
 def plans():
 
     user_id = session["user_id"]
-    plans = db.execute("SELECT * FROM plans WHERE user_id = ?;", user_id)
+    plans = db.execute("SELECT * FROM plans WHERE user_id = ? ORDER BY id DESC;", user_id)
  
     return render_template("plans.html", plans=plans)
 
@@ -198,7 +265,7 @@ def copy_plan(plan_id):
     plans = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?;", user_id, plan_id)
 
     #get time on real time
-    day_added = datetime.now()
+    day_added = datetime.date.today()
 
     # Indexing all values to single variables for easier treatement with forms and database
     index = plans[0]
@@ -282,15 +349,18 @@ def edit_plan(plan_id):
     plans = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?;", user_id, plan_id)
 
     #get time on real time
-    now = datetime.now()
+    now = datetime.date.today()
 
     # Indexing all values to single variables for easier treatement with forms and database
     index = plans[0]
     plan_name = index["name"]
     PERIOD = index["period"]
     total_income = index["total_income"]
+    total_income_format = babel.numbers.format_currency(total_income, '$', locale="en_US")
     total_expense = index["total_expense"]
+    total_expense_format = babel.numbers.format_currency(total_expense, '$', locale="en_US")
     result = index["result"]
+    result_format = babel.numbers.format_currency(result, '$', locale="en_US")
 
     # get list of incomeson this plan
     incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, plan_id)
@@ -338,10 +408,11 @@ def edit_plan(plan_id):
         if income_name and income:
             
             # update plans database with this plans id
+            
             total_income = int(total_income) + int(income)
-            result = int(result) + int(total_income)
+            result = int(total_income) - total_expense
             
-            
+        
             # INSERT incomes database with this plans id
             db.execute("INSERT INTO incomes (day_added, name, user_id, currency, income, plan_id) VALUES (:day_added, :name, :user_id, :currency, :income, :plan_id)",
                 day_added=now,
@@ -453,8 +524,8 @@ def edit_plan(plan_id):
     return render_template("edit_plan.html", plans=plans, plan_name=plan_name, 
                                             plan_id=plan_id, PERIOD=PERIOD, 
                                             expenses=expenses, types_of_expenses=types_of_expenses,
-                                            currencies=currencies, incomes=incomes, total_income=total_income,
-                                            total_expense=total_expense, result=result)
+                                            currencies=currencies, incomes=incomes, total_income_format=total_income_format,
+                                            total_expense_format=total_expense_format, result_format=result_format)
 
 
 
@@ -477,7 +548,7 @@ def new_plan():
         plan_id = 1
 
     #get time on real time
-    now = datetime.now()
+    now = datetime.date.today()
 
     # get list of incomes on this plan
     incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, plan_id)
@@ -607,152 +678,11 @@ def new_plan():
             flash("Plan added! Chek out your plans on the Plans Page.")   
 
         
-        return render_template("index.html", expense1=expense1)
+        return redirect("/")
 
     return render_template("new_plan.html", name=name, currencies=currencies, types_of_expenses=types_of_expenses, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id, ) 
 
 
-
-"""        
-@app.route("/new_plan", methods=["GET", "POST"])
-@login_required
-def new_plan():
-
-    #form = AddPlan(request.form)
-
-    # get user id to pass as a list to html 
-    user_id = session["user_id"]
-    name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
-    
-    # create plan ID by executing a query over plas and past ids
-    past_id = db.execute("SELECT id FROM plans WHERE user_id=? ORDER BY id DESC limit 1", user_id)
-    
-    #checking if it´s the first plan for this user
-    if past_id:
-        index = past_id[0]
-        plan_id = index["id"] + 1
-    else: 
-        plan_id = 1
-
-    #get time on real time
-    now = datetime.now()
-
-    # get list of incomes
-    incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, plan_id)
-    
-    # get list of expenses
-    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? AND plan_id=? ORDER BY name ASC", user_id, plan_id)
-
-
-    if request.method == "POST":
-        
-        PERIOD = 0
-        
-        # PERIOD DEFINITION
-        if request.form.get("day"):
-            # calculate today and send it to template
-            PERIOD = now.strftime("%A %d, %b of %Y")
-            return render_template("new_plan.html", PERIOD=PERIOD, name=name, currencies=currencies)
-
-        if request.form.get("month"):
-            # calculate 1 month from today and send it to template
-            this_month = now.strftime("%Y-%m-%d")
-            next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=1)).strftime("%Y-%m-%d")
-            PERIOD = f"1 Month. \nFrom: {this_month} to {next_month}"
-            return render_template("new_plan.html", PERIOD=PERIOD, name=name,currencies=currencies)
-
-        if request.form.get("quarter"):
-            # calculate 3 months from today and send it to template
-            this_month = now.strftime("%Y-%m-%d")
-            next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=3)).strftime("%Y-%m-%d")
-            PERIOD = f"1 quarter. \nFrom: {this_month} to {next_month}"
-            return render_template("new_plan.html", PERIOD=PERIOD, name=name,currencies=currencies)
-
-        if request.form.get("year"):
-            # calculate 12 month from today and send it to template
-            this_month = now.strftime("%Y-%m-%d")
-            next_month = (pd.to_datetime(this_month)+pd.DateOffset(months=12)).strftime("%Y-%m-%d")
-            PERIOD = f"1 year. \nFrom: {this_month} to {next_month}"
-            return render_template("new_plan.html", PERIOD=PERIOD, name=name,currencies=currencies)
-        
-        # INCOME
-        
-        # get input from income form
-        income_name = request.form.get("income_name")
-        currency = request.form.get("currency")
-        income = request.form.get("income")
-        
-
-        # validate if all fields are filled out
-
-
-        # TODO
-
-
-
-
-        ON DEVELOPMENT
-        # validate if all fields are filled out
-        if income_name is None:
-            flash("Please select a income name.")
-            return redirect("/new_plan")
-
-        if currency is None:
-            flash("Please insert an currency.")
-            return redirect("/new_plan")
-
-        if income is None:
-            flash("Please insert an income amount.")
-            return redirect("/new_plan")            
-        
-        
-        # prim_key to check for succesfull data entry 
-        prim_key = db.execute("INSERT INTO incomes (day_added, name, user_id, income, currency) VALUES (:day_added, :name, :user_id, :income, :currency)",
-                                day_added=now,
-                                name=income_name,
-                                user_id=user_id,
-                                income=income,
-                                currency=currency)
-        if prim_key is None:
-                flash("Error. Please contact support")
-                return redirect("/new_plan")
-        else:
-            flash("Income added!")
-        
-        # EXPENSES
-
-        # get input from expense form
-        expense_name = request.form.get("expense_name")
-        expense = request.form.get("expense")
-
-
-        # PLAN
-
-        plan = db.execute("SELECT id FROM plans WHERE user_id=? ORDER BY id DESC limit 1", user_id)
-        
-        #define a plan dictionary
-        DictItems = {plan_id:{"name":plan.name, "date":plan.day_added, 
-        "total_income":plan.total_income, "total_income":plan.total_income, 
-        "total_expense":plan.total_expense, "result":plan.result, "user_id":plan.user_id}}
-        
-        if "PlanSession" in session:
-            print(session["PlanSession"])
-            if plan_id in session["PlanSession"]:
-                print("This plan already exists.")
-            else:
-                session["PlanSession"] = MagerDicts(session["PlanSession"], DictItems)
-                return redirect(request.referrer)
-
-        else:
-            session["PlanSession"] = DictItems
-            return redirect(request.referrer)
-
-
-        return render_template("new_plan.html", name=name,currencies=currencies, expenses=expenses,incomes=incomes, PERIOD=PERIOD, plan_id=plan_id, form=form)
-        
-    return render_template("new_plan.html", name=name, currencies=currencies, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id, form=form) 
-
-"""
 
 @app.route("/add_expense", methods=["GET", "POST"])
 @login_required

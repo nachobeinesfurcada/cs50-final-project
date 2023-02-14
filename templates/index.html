@@ -13,37 +13,29 @@
     <div>
         <h5>Here you will see your current plan information.</h5>
     </div>
+    <h4>Current plan: {% block plan_id %} {{ plan_id }} {% endblock %}</h4>
 
+    CURRENT PLAN DASHBOARD 
 
-    <!-- CURRENT PLAN DASHBOARD -->
+   <!-- PAST PLANS DASHBOARD 
 
-    {% for key, value in incomes %}
-    {% if value is string %}
-        ["{{ key }}", "{{ value }}"],
-    {% else %}
-        ["{{ key }}", {{ value }}],
-    {% endif %}
+    <br><br>
+    {% for key, value in incomes %} 
+
+        {% if value is string %}
+            ["{{ key.name }}", "{{ value.income }}"],
+        {% else %}
+            ["{{ key.name }}", {{ value.income }}],
+        {% endif %}
     {% endfor %}
+-->
+    <br><br>
+    {% for name in names %} {{name}} {% endfor %}
+    {% for value in values %} {{value}} {% endfor %}
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th class="text-start">Tax ID</th>
-                <th class="text-center">Tax Name</th>
-                <th class="text-center">Country</th>
-                <th class="text-end">Percentage</th>
-                <th style="color: blue" class="text-end">Add tax</th>
-            </tr>
-        </thead>
-    <tbody>
-            {% for key, values in incomes %}
-                <tr>
-                    <td class="text-start">{{ incomes[key] }}</td>
-                    <td class="text-start">{{ incomes[values] }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    
+    
+
     <!-- PAST PLANS DASHBOARD -->
     <br> <hr><br><h2> </h2><br>
     
@@ -51,6 +43,39 @@
         <div id="piechart" style="width: 900px; height: 500px;"></div>
     </div>
 
+    number of plans: {% block content1212122 %} {{ num_plans }} {% endblock %}
+
+    <br>
+
+    this year = {% block this_year %} {{ this_year }} {% endblock %}
+
+    <br>
 
 
-{% endblock %}
+    total income from this year = {% block total_income_from_this_year_formatted %}{{ total_income_from_this_year_formatted }} {% endblock %}
+
+    <br>
+
+    total_expense_from_this_year_formatted = {% block total_expense_from_this_year_formatted %}{{ total_expense_from_this_year_formatted }} {% endblock %}
+    
+    <br>
+
+    results over income per plan = {% block formated_perc %}{{ formated_perc }} {% endblock %}
+    
+    <br>
+
+    total types of plan = {% block total_types_of_expenses %}{{ total_types_of_expenses }} {% endblock %}
+    <br>
+
+    average_total_income_per_plan_f = {% block average_total_income_per_plan_f %}{{ average_total_income_per_plan_f }} {% endblock %}
+    <br>
+
+    average_total_expense_per_plan_f = {% block average_total_expense_per_plan_f %}{{ average_total_expense_per_plan_f }} {% endblock %}
+    <br>
+
+
+    result_over_4_weeks = {% block result_over_4_weeks %}{{ result_over_4_weeks }} {% endblock %}
+    <br>
+    <br>
+
+    {% endblock %}

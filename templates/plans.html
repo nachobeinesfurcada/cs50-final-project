@@ -36,9 +36,9 @@
                         <td class="text-center">{{ plan.date_added }}</td>
                         <td class="text-center">{{ plan.name }}</td>
                         <td class="text-center">{{ plan.period }}</td>
-                        <td class="text-center">{{ plan.total_income }}</td>
-                        <td class="text-center">{{ plan.total_expense }}</td>
-                        <td class="text-end">{{ plan.result }}</td>
+                        <td class="text-center">ARS {{ plan.total_income }}</td>
+                        <td class="text-center">ARS {{ plan.total_expense }}</td>
+                        <td class="text-end">ARS {{ plan.result }}</td>
                         <td><a class="btn btn-info btn-xs un-extended" href="/edit_plan/{{plan.id}}">Edit</a></td>
                         <td><a class="btn btn-info btn-xs un-extended" href="/copy_plan/{{plan.id}}">Copy</a></td>
                         <td><a class="btn btn-info btn-xs un-extended" href="/delete_plan/{{plan.id}}">Delete</a></td>

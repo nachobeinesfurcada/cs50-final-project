@@ -28,32 +28,6 @@
 
         <title>Ultimate Finance: {% block title %}{% endblock %}</title>
 
-        <script type="text/javascript">
-            google.charts.load("current", {packages:["corechart"]});
-            google.charts.setOnLoadCallback(drawChart);
-            function drawChart() {
-              var data = google.visualization.arrayToDataTable([
-                {% for key, value in incomes %}
-                    ['{{ key }}', {{ value }}],
-                {% endfor %}
-              ]);
-      
-            var options = {
-              legend: 'none',
-              pieSliceText: 'label',
-              title: 'Incomes on this Plan',
-              pieStartAngle: 0,
-            };
-      
-              var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-              chart.draw(data, options);
-            }
-          </script>
-
-
-
-
-
     </head>
 
     <body>
@@ -97,8 +71,7 @@
             </header>
         {% endif %}
         <div class="usd_values">
-            <p> compra: {% block content1 %} {{ compra }} {% endblock %} 
-                venta:{% block content2 %} {{ venta }} {% endblock %}</p>
+            <p> Currency: ARS</p>
         </div>
         <main class="container-fluid py-5 text-center">
             {% block main %}{% endblock %}
