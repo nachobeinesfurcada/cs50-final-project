@@ -6,7 +6,9 @@
 
 {% block main %}
 
-<a href="/planning">Back to planning</a><br><br>
+<h2>Welcome to you Expense Manager</h2>
+<h5>Here you will be able to add a Type of Expense to you expenses list</h5>
+<a href="/new_plan">Back to planning</a><br><br>
 
 
     <div class="add_expense container">
@@ -22,12 +24,9 @@
             </div><br>
             <div class="form-group col-6" style="margin:auto">
               <label for="ExpenseDescription"><strong>Description</strong> (Optional)</label>
-              <input autocomplete="off" type="text" class="form-control" name="ExpenseDescription" id="ExpenseDescription" placeholder="House on Park Ave. & 29th NYC.">
+              <input style="height: 150px;"autocomplete="off" type="text" class="form-control" name="ExpenseDescription" id="ExpenseDescription" placeholder="House on Park Ave. & 29th NYC.">
             </div><br>
-            <div class="form-group col-6" style="margin:auto">
-                <label for="Past_Value"><strong>Last Value Recorded</strong></label>
-                <input readonly type="text" id="Past_Value" class="form-control" placeholder="Default: $ 00.00">
-            </div>
+
             <br> <button class="btn btn-primary" type="submit">Submit</button>
         </form>
         
@@ -50,18 +49,16 @@
                     <th class="text-start">Expense ID</th>
                     <th class="text-center">Date added</th>
                     <th class="text-center"><strong>Name</strong></th>
-                    <th style="width:30%" class="text-center">Description</th>
-                    <th class="text-end">Last Value Recorded</th>
+                    <th style="width:50%" class="text-center">Description</th>
                 </tr>
             </thead>
            <tbody>
-                {% for expense in expenses %}
+                {% for expense_type in types_of_expenses %}
                     <tr>
-                        <td class="text-start">{{ expense.id }}</td>
-                        <td class="text-center">{{ expense.day_added }}</td>
-                        <td class="text-center"><strong>{{ expense.name }}</strong></td>
-                        <td class="text-center">{{ expense.description }}</td>
-                        <td class="text-end">{{ expense.past_value }}</td>
+                        <td class="text-start">{{ expense_type.id }}</td>
+                        <td class="text-center">{{ expense_type.day_added }}</td>
+                        <td class="text-center"><strong>{{ expense_type.name }}</strong></td>
+                        <td class="text-center">{{ expense_type.description }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

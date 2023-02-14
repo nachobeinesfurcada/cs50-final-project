@@ -5,50 +5,45 @@
 {% endblock %}
 
 {% block main %}
-    
+    <h1></h1>
     <form action="/new_plan" method="post">       
     <div>
         <h2 style="text-align:center">Welcome to your new Plan </h2>
         <p class="name" style="text-align:center" style="color:rgb(255, 168, 69)">{% for name in name %}{{ name.name }}{% endfor %}</p>
     </div>
-
+     
     <br>
     <div> 
         <h6 style="text-align:center">Here you will be able to make a plan for the period of your choice. <h6>
     </div>
     <br>
-    <div class="summary">
-        <br><h2>Planning Summary</h2>
-        <br> <h6>Once you add things to your plan, they will apear here.</h6>
-        
-        <table class="summary_table text-center" style="width:90%">
-            <tr >
-              <th style="width:33%">Period</th>
-              <th style="width:33%">Total Income</th>
-              <th style="width:33%">Total Expenses</th>
-            </tr>
-            <tr style="height:100px">
-                <td>{% block content3 %} {{ period }} {% endblock %}</td>
-                <td></td>
-                <td><td>
-            </tr>
-          </table>
-          <br>
-    </div>
+
+    <h3>This plan's ID is: {% block plan %} {{ plan_id }} {% endblock %}</h3>
+
+
+
     <br><br>
     <a class="hyperlinks" href="#income">Income</a><a class="hyperlinks" href="#expenses">|           Expenses</a> 
     <br><br>
-    
+        <div class="container">
+            <h3>Name of plan</h3>
+            <input class="form-control" type="text" name="plan_name" placeholder="Example: Monthly organization house Talar del Lago 497"><br>
+        </div>
+        
         <div class="period container">
             <br>
             <h3>Period</h3>
             <p>Please select the period you want to do some planning. </p>
-            <input onclick="period();" class="btn btn-primary" id="day" name="day" type="submit" value="Day">
-            <input onclick="period();" class="btn btn-primary" id="month" name="month" type="submit" value="Month">
-            <input onclick="period();" class="btn btn-primary" id="quarter" name="quarter" type="submit" value="Quarter">
-            <input onclick="period();" class="btn btn-primary" id="year" name="year" type="submit" value="Year">
-            <br><br>
-        </div><br><br>
+            <select class="form-control form-row container" name="periods">
+                <option selected disabled>Select period ></option>
+                {% for period in periods %}
+                <option>{{ period }}</option>
+                {% endfor %}
+            </select>
+            
+        </div>
+        
+        
         <div class="income container" id="income">
             <br><h3>Expected Income</h3>
             <p>Please insert the income you expect to have over this period.  <br>You will be able to change it if it suffers modifications. 
@@ -66,19 +61,12 @@
                 </div><br>
                 <div class="col">
                     <strong>Income</strong> 
-                    <input class="form-control" type="text" name="income" placeholder="00.00">
+                    <input class="form-control" type="number" name="income" placeholder="00.00">
                 </div>
             </div>
-            
             <p>The currency you select here will be the same as on the expenses.</p>
-
-            <div>
-                <br>
-                <button class="btn btn-outline-success" type="submit">Submit Income</button>
-                <br>
-            </div>
             <br>
-            <h5 class="past-incomes">Past Incomes...</h5>
+            <!--<h5 class="incomes_expenses_on_this_plan">Incomes on this Plan</h5>
             <table class="table table-striped grey">
                 <thead>
                     <tr>
@@ -96,27 +84,129 @@
                         </tr>
                     {% endfor %}
                 </tbody>
-            </table>
+            </table> -->
         </div>
         
-        <br>
+        
+
+        <!-- EXPENSES -->
         
         <div style="margin:auto" id="expenses" class="income container">
             <br><h3>Expected Expenses</h3>
-            <p>Please insert the expenses you expect to have over this period.  <br><p>If you don´t see an expense you want to use, feel free to add one to your list <a href="/add_expense"><strong>here</strong></a>.</p>
-            <p class="table_title">Add expenses to your planning</p>
-            <a style="margin:auto" class="add btn btn-light">&plus;</a>
-            <br>
-            <div class="inp-group">
+            <p>Please insert the expenses you expect to have over this period.  <br>You will be able to change it if it suffers modifications. 
+            <p>If you don´t see an Expense you wish to add, you can add one <strong><a href="/add_expense">here</a></strong>.</p>
+                <div class="form-row expected_income" >
+                    <div class="col">
+                        <strong>Expense name 1</strong>
+                        <select class="form-control" name="expense_name1">
+                            <option selected disabled>Select option</option>
+                            {% for expense_type in types_of_expenses %}
+                            <option>{{ expense_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 
-            </div>
-            <div>
+                    <div class="col">
+                        <strong>Expense</strong> 
+                        <input class="form-control" type="number" name="expense1" placeholder="00.00">
+                    </div>
+             </div>
                 <br>
-                <button class="btn btn-outline-success" type="submit">Submit expenses</button>
+                <div class="form-row expected_income" >
+                    <div class="col">
+                        <strong>Expense name 2</strong>
+                        <select class="form-control" name="expense_name2">
+                            <option selected disabled>Select option</option>
+                            {% for expense_type in types_of_expenses %}
+                            <option>{{ expense_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                
+                
+                    <div class="col">
+                        <strong>Expense</strong> 
+                        <input class="form-control" type="number" name="expense2" placeholder="00.00">
+                    </div>
+                </div>
+                <br><!--
+
+                <div class="form-row expected_income" >
+                    <div class="col">
+                        <strong>Expense name 3</strong>
+                        <select class="form-control" name="expense_name3">
+                            <option selected disabled>Select option</option>
+                            {% for expense_type in types_of_expenses %}
+                            <option>{{ expense_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <strong>Expense</strong> 
+                    <input class="form-control" type="number" name="expense3" placeholder="00.00">
+                </div>
                 <br>
-            </div>
+                <div class="form-row expected_income" >
+                    <div class="col">
+                        <strong>Expense name 4</strong>
+                        <select class="form-control" name="expense_name4">
+                            <option selected disabled>Select option</option>
+                            {% for expense_type in types_of_expenses %}
+                            <option>{{ expense_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <strong>Expense</strong> 
+                    <input class="form-control" type="number" name="expense4" placeholder="00.00">
+                </div>
+                <br>-->
+                <p><strong>You will be able to add more expenses to this plan if you want to</strong></p>
+                        
+            
+            <!--<div>
+                <br>
+                <button class="btn btn-outline-success" type="submit">Submit Expense</button>
+                <br>
+            </div>-->
+
             <br>
+            <!--<h5 class="incomes_expenses_on_this_plan">Expenses on this Plan</h5>
+            <table class="table table-striped grey">
+                <thead>
+                    <tr>
+                        <th class="text-start">Expense Name</th>
+                        <th class="text-center">Day added</th>
+                        <th class="text-center">Description</th>
+                        <th class="text-end">Past Income</th>
+                    </tr>
+                </thead>
+               <tbody>
+                    {% for expense in expenses %}
+                        <tr>
+                            <td class="text-start">{{ expense.name }}</td>
+                            <td class="text-center">{{ expense.day_added }}</td>
+                            <td class="text-center">{{ expense.description }}</td>
+                            <td class="text-end">{{ expense.past_value }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>-->
+
         </div>
+        
+
+        <!-- SUBMIT BUTTON -->
+        <div>
+            <br>
+            <button class="btn btn-primary" type="submit">SUBMIT PLAN</button>
+            <br>
+            <p>You will be able to make changes if you want to on the Plans page. </p>
+        </div><br>
+
+
         <script>
             const addBtn = document.querySelector(".add");
 
@@ -169,3 +259,25 @@
         
     </form>
 {% endblock %}
+
+<!--expenses dynamic-->
+<!--            <br><h3>Expected Expenses</h3>
+            <p>Please insert the expenses you expect to have over this period.  <br><p>If you don´t see an expense you want to use, feel free to add one to your list <a href="/add_expense"><strong>here</strong></a>.</p>
+            <p class="table_title">Add expenses to your planning</p>
+            <a style="margin:auto" class="add btn btn-light">&plus;</a>
+            <br>
+            <div class="inp-group">
+                
+            </div>
+            <div>
+                <br>
+                <button class="btn btn-outline-success" type="submit">Submit expenses</button>
+                <br>
+            </div>-->
+
+            <!--
+            <input onclick="period();" class="btn btn-primary" id="day" name="day" type="submit" value="Day">
+            <input onclick="period();" class="btn btn-primary" id="month" name="month" type="submit" value="Month">
+            <input onclick="period();" class="btn btn-primary" id="quarter" name="quarter" type="submit" value="Quarter">
+            <input onclick="period();" class="btn btn-primary" id="year" name="year" type="submit" value="Year">
+            -->

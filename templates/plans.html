@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add Expense
+{% endblock %}
+
+{% block main %}
+
+    <h2>Welcome to your Plans</h2><br>
+    <main class="container py-5 text-center">
+        
+        <table class="table table-striped">
+            <!--<colgroup>
+                <col class="" span="2" />
+                <col class="green" span="1" />
+            
+            </colgroup> -->  
+            <thead>
+                <tr>
+                    <th class="text-start">Plan ID</th>
+                    <th class="text-center">Date added</th>
+                    <th class="text-center">Name</th>
+                    <th class="text-center">Period</th>
+                    <th class="text-center">Total Income</th>
+                    <th class="text-center">Total Expense</th>
+                    <th class="text-end">Period Result</th>
+                    <th class="text-center">Edit</th>
+                    <th class="text-center">Copy</th>
+                    <th class="text-center">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for plan in plans %}
+                    <tr>
+                        <td class="text-start">{{ plan.id }}</td>
+                        <td class="text-center">{{ plan.date_added }}</td>
+                        <td class="text-center">{{ plan.name }}</td>
+                        <td class="text-center">{{ plan.period }}</td>
+                        <td class="text-center">ARS {{ plan.total_income }}</td>
+                        <td class="text-center">ARS {{ plan.total_expense }}</td>
+                        <td class="text-end">ARS {{ plan.result }}</td>
+                        <td><a class="btn btn-info btn-xs un-extended" href="/edit_plan/{{plan.id}}">Edit</a></td>
+                        <td><a class="btn btn-info btn-xs un-extended" href="/copy_plan/{{plan.id}}">Copy</a></td>
+                        <td><a class="btn btn-info btn-xs un-extended" href="/delete_plan/{{plan.id}}">Delete</a></td>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </main>
+
+
+{% endblock %}
