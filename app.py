@@ -165,15 +165,17 @@ def index():
             #calculate result / 4 (for weekend expenses)
             result_over_weeks = int(plan_index["result"]) / 4
 
-        names = []
-        values = []
-        for row in incomes:
-            names.append(row[0])
-            values.append(row[1])
 
+        # FIRST TWO GRAPHS
 
+        income_names_in_plan = db.execute("SELECT name FROM incomes WHERE user_id = ? AND plan_id = ? GROUP BY name ORDER BY day_added ASC", user_id, plan_id)
+        names_index = income_names_in_plan[0]
+        
+        #for row in incomes["name"]:
+        #    names.append(incomes[row]["name"])
+       
         # USER DATA
-
+        
         # number of plans
         numplans = db.execute("SELECT count(id) as num_plans FROM plans WHERE user_id=?", user_id)
         index = numplans[0]
@@ -230,7 +232,8 @@ def index():
                              formated_perc=formated_perc, total_types_of_expenses=total_types_of_expenses,
                              average_total_income_per_plan_f=average_total_income_per_plan_f,
                              average_total_expense_per_plan_f=average_total_expense_per_plan_f,
-                             income_index=income_index, values=values, names=names)
+                             income_names_in_plan=income_names_in_plan,
+                             names_index=names_index)
 
 
 @app.route("/logout")
@@ -596,8 +599,6 @@ def new_plan():
         income_name = request.form.get("income_name")
         currency = request.form.get("currency")
         income = request.form.get("income")
-
-        
 
         total_income = 0
         total_expense = 0

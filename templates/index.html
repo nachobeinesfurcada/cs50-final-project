@@ -28,11 +28,14 @@
             ["{{ key.name }}", {{ value.income }}],
         {% endif %}
     {% endfor %}
--->
+
     <br><br>
     {% for name in names %} {{name}} {% endfor %}
     {% for value in values %} {{value}} {% endfor %}
-
+--><br>
+    {% block income_names_in_plan %} {{ income_names_in_plan }} {% endblock %}
+    <br>
+    {% block  names_index%} {{ names_index }} {% endblock %}
     
     
 
