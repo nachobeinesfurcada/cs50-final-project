@@ -7,6 +7,7 @@
 {% block main %}
 
     <h2>Welcome to your Plans</h2><br>
+    <p>Here you will be able to modify all your plans. Notice that it is ordered by Plan ID, so you will see your most recent ones on top.</h9>
     <main class="container py-5 text-center">
         
         <table class="table table-striped">
@@ -29,9 +30,9 @@
                     <th class="text-center">Delete</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody ALIGN="center" >
                 {% for plan in plans %}
-                    <tr>
+                    <tr style="vertical-align:middle">
                         <td class="text-start">{{ plan.id }}</td>
                         <td class="text-center">{{ plan.date_added }}</td>
                         <td class="text-center">{{ plan.name }}</td>

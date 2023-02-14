@@ -12,7 +12,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 
 import pandas as pd
 import time
-import datetime
+from datetime import datetime, date
 from extras import login_required, MagerDicts
 
 import babel.numbers
@@ -124,22 +124,53 @@ def login():
 @login_required
 def index():
 
+    # user data
     user_id = session["user_id"] 
     name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
 
     # todays date
-    today = datetime.date.today()
+    today = date.today()
 
     # Get latest plan_id
     plan_id_index = db.execute("SELECT id FROM plans WHERE user_id = ? ORDER BY id DESC limit 1", user_id)
     index = plan_id_index[0]
     plan_id = index["id"]
 
-    incomes = db.execute("SELECT name, sum(income) AS income FROM incomes WHERE user_id = ? AND plan_id = ? GROUP BY name ORDER BY day_added ASC", user_id, plan_id)
-    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? AND plan_id=? ORDER BY day_added ASC", user_id, plan_id)
-    plan = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?;", user_id, plan_id)
+    # get latest currency
+    currency_index = db.execute("SELECT currency FROM incomes WHERE user_id = ? AND plan_id = ? ORDER BY plan_id DESC limit 1", user_id, plan_id)
+    index = currency_index[0]
+    latest_currency= index["currency"]
 
-    income_index = incomes[0]
+
+    incomes = db.execute("SELECT name, sum(income) AS income FROM incomes WHERE user_id = ? AND plan_id = ? GROUP BY name ORDER BY day_added ASC", user_id, plan_id)
+    expenses = db.execute("SELECT name, sum(expense) as expense FROM expenses WHERE user_id = ? AND plan_id=? ORDER BY day_added ASC", user_id, plan_id)
+    plan = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?;", user_id, plan_id)
+        
+    # formating the data into a list for it to be user on the javascript file    
+    currplan_income_data = []
+    for row in incomes:
+        currplan_income_data.append([row['name'], row['income']])
+        
+    # formating the data into a list for it to be user on the javascript file        
+    currplan_expense_data = []
+    for row in expenses:
+        currplan_expense_data.append([row['name'], row['expense']])
+
+    # ALL INCOMES and EXPENSES from all plans
+
+    all_incomes = db.execute("SELECT name, sum(income) AS income FROM incomes WHERE user_id = ? GROUP BY name", user_id)
+    all_expenses = db.execute("SELECT name, sum(expense) AS expense FROM expenses WHERE user_id = ? GROUP BY name", user_id)
+
+    # formating the data into a list for it to be user on the javascript file    
+    all_income_data = []
+    for row in all_incomes:
+        all_income_data.append([row['name'], row['income']])
+
+    # formating the data into a list for it to be user on the javascript file        
+    all_expense_data = []
+    for row in all_expenses:
+        all_expense_data.append([row['name'], row['expense']])
+
 
     # creating variables for analysis
     result_over_weeks = 0
@@ -159,20 +190,11 @@ def index():
             expenses = 0
         else:     
             expense_index = expenses[0]
-        
-        if plan_index["period"] == "Month":
-            
-            #calculate result / 4 (for weekend expenses)
-            result_over_weeks = int(plan_index["result"]) / 4
 
+        #calculate result / 4 (for weekend expenses)
+        result_over_weeks = int(plan_index["result"]) / 4
 
-        # FIRST TWO GRAPHS
-
-        income_names_in_plan = db.execute("SELECT name FROM incomes WHERE user_id = ? AND plan_id = ? GROUP BY name ORDER BY day_added ASC", user_id, plan_id)
-        names_index = income_names_in_plan[0]
-        
-        #for row in incomes["name"]:
-        #    names.append(incomes[row]["name"])
+       
        
         # USER DATA
         
@@ -232,9 +254,9 @@ def index():
                              formated_perc=formated_perc, total_types_of_expenses=total_types_of_expenses,
                              average_total_income_per_plan_f=average_total_income_per_plan_f,
                              average_total_expense_per_plan_f=average_total_expense_per_plan_f,
-                             income_names_in_plan=income_names_in_plan,
-                             names_index=names_index)
-
+                             latest_currency=latest_currency, currplan_income_data=currplan_income_data, 
+                             currplan_expense_data=currplan_expense_data,
+                             all_expense_data=all_expense_data, all_income_data=all_income_data)
 
 @app.route("/logout")
 def logout():
@@ -254,10 +276,35 @@ def logout():
 def plans():
 
     user_id = session["user_id"]
+    name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
     plans = db.execute("SELECT * FROM plans WHERE user_id = ? ORDER BY id DESC;", user_id)
  
-    return render_template("plans.html", plans=plans)
+    plan_id_index = db.execute("SELECT id FROM plans WHERE user_id = ? ORDER BY id DESC limit 1", user_id)
+    index = plan_id_index[0]
+    plan_id = index["id"]
 
+    # get latest currency
+    currency_index = db.execute("SELECT currency FROM incomes WHERE user_id = ? AND plan_id = ? ORDER BY plan_id DESC limit 1", user_id, plan_id)
+    index = currency_index[0]
+    latest_currency= index["currency"]   
+
+    return render_template("plans.html", plans=plans, name=name, latest_currency=latest_currency)
+
+
+
+@app.route("/delete_plan/<plan_id>", methods=["GET", "POST"])
+@login_required
+def delete_plan(plan_id):
+    
+    user_id = session["user_id"]
+    plans = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?", user_id, plan_id)
+
+    delete = db.execute("DELETE FROM plans WHERE user_id = ? AND id = ?", user_id, plan_id)
+
+   
+    flash("Plan terminated")  
+
+    return redirect("/plans")
 
 
 @app.route("/copy_plan/<plan_id>", methods=["GET", "POST"])
@@ -340,7 +387,7 @@ def copy_plan(plan_id):
     flash(f"Old plan {old_plan_id} copied. New plan {new_plan_id} added!")
 
         
-    return render_template("plans.html", plans=plans)
+    return redirect("/plans")
     
 
 
@@ -518,10 +565,7 @@ def edit_plan(plan_id):
 
             flash("Expense Deleted Successfully")
 
-
-        # COPY BUTTONS
-
-
+        
         return redirect(request.url)
 
     return render_template("edit_plan.html", plans=plans, plan_name=plan_name, 
@@ -532,14 +576,26 @@ def edit_plan(plan_id):
 
 
 
+
+
 @app.route("/new_plan", methods=["GET", "POST"])
 @login_required
 def new_plan():
 
+    
     # get user id to pass as a list to html 
     user_id = session["user_id"]
     name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
     
+    plan_id_index = db.execute("SELECT id FROM plans WHERE user_id = ? ORDER BY id DESC limit 1", user_id)
+    index = plan_id_index[0]
+    plan_id = index["id"]
+
+    # get latest currency
+    currency_index = db.execute("SELECT currency FROM incomes WHERE user_id = ? AND plan_id = ? ORDER BY plan_id DESC limit 1", user_id, plan_id)
+    index = currency_index[0]
+    latest_currency= index["currency"]   
+
     # create plan ID by executing a query over plas and past ids
     past_id = db.execute("SELECT id FROM plans WHERE user_id=? ORDER BY id DESC limit 1", user_id)
     
@@ -551,7 +607,7 @@ def new_plan():
         plan_id = 1
 
     #get time on real time
-    now = datetime.date.today()
+    now = date.today()
 
     # get list of incomes on this plan
     incomes = db.execute("SELECT * FROM incomes WHERE user_id = ? AND plan_id=? ORDER BY id ASC", user_id, plan_id)
@@ -599,6 +655,8 @@ def new_plan():
         income_name = request.form.get("income_name")
         currency = request.form.get("currency")
         income = request.form.get("income")
+
+        
 
         total_income = 0
         total_expense = 0
@@ -681,7 +739,7 @@ def new_plan():
         
         return redirect("/")
 
-    return render_template("new_plan.html", name=name, currencies=currencies, types_of_expenses=types_of_expenses, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id, ) 
+    return render_template("new_plan.html", name=name, currencies=currencies, types_of_expenses=types_of_expenses, expenses=expenses, incomes=incomes,periods=periods, plan_id=plan_id, latest_currency=latest_currency) 
 
 
 
@@ -692,6 +750,16 @@ def add_expense():
     user_id = session["user_id"]
     name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
     
+    # Get latest plan_id
+    plan_id_index = db.execute("SELECT id FROM plans WHERE user_id = ? ORDER BY id DESC limit 1", user_id)
+    index = plan_id_index[0]
+    plan_id = index["id"]
+
+    # get latest currency
+    currency_index = db.execute("SELECT currency FROM incomes WHERE user_id = ? AND plan_id = ? ORDER BY plan_id DESC limit 1", user_id, plan_id)
+    index = currency_index[0]
+    latest_currency= index["currency"]
+
     types_of_expenses = db.execute("SELECT * FROM types_of_expenses WHERE user_id = ?", user_id)
 
     if request.method == "POST":
@@ -703,8 +771,9 @@ def add_expense():
             flash(u'Must provide an Expense Name', 'error')
             return redirect("add_expense")
 
-        timestamp = time.time()
-        date_time = datetime.fromtimestamp(timestamp)
+        
+        date_time = date.today()
+
         
         # if description is not null:
         if expense_desc is not None:
@@ -734,7 +803,7 @@ def add_expense():
 
         return redirect("/add_expense")
 
-    return render_template("add_expense.html", types_of_expenses=types_of_expenses)
+    return render_template("add_expense.html", types_of_expenses=types_of_expenses, latest_currency=latest_currency, name=name)
 
 
 @app.route("/settings", methods=["GET", "POST"])

@@ -11,74 +11,231 @@
         {% endfor %}
     </div>
     <div>
+        
         <h5>Here you will see your current plan information.</h5>
+    
     </div>
-    <h4>Current plan: {% block plan_id %} {{ plan_id }} {% endblock %}</h4>
-
-    CURRENT PLAN DASHBOARD 
-
-   <!-- PAST PLANS DASHBOARD 
-
-    <br><br>
-    {% for key, value in incomes %} 
-
-        {% if value is string %}
-            ["{{ key.name }}", "{{ value.income }}"],
-        {% else %}
-            ["{{ key.name }}", {{ value.income }}],
-        {% endif %}
-    {% endfor %}
-
-    <br><br>
-    {% for name in names %} {{name}} {% endfor %}
-    {% for value in values %} {{value}} {% endfor %}
---><br>
-    {% block income_names_in_plan %} {{ income_names_in_plan }} {% endblock %}
-    <br>
-    {% block  names_index%} {{ names_index }} {% endblock %}
     
-    
+    <!-- THIS PLANS CHARTS -->
+    <div >
+        <div id="chart_container">
+            <div id="income_chart"></div>
+            <div id="expense_chart"></div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+   <h2> </h2><br>
+
 
     <!-- PAST PLANS DASHBOARD -->
-    <br> <hr><br><h2> </h2><br>
-    
-    <div class="history_dashboard">
-        <div id="piechart" style="width: 900px; height: 500px;"></div>
+    <div >
+    <div id="chart_container">
+        <div id="all_income_chart"></div>
+        <div id="all_expense_chart"></div>
     </div>
-
-    number of plans: {% block content1212122 %} {{ num_plans }} {% endblock %}
-
-    <br>
-
-    this year = {% block this_year %} {{ this_year }} {% endblock %}
-
-    <br>
+</div>
 
 
-    total income from this year = {% block total_income_from_this_year_formatted %}{{ total_income_from_this_year_formatted }} {% endblock %}
+        <div class="User_data_dashboard container">
+            <h2 style="color:rgb(112, 157, 194)">Some of your usefull information, analysed </h2>
+            <h6> Year:{% block _this_year %} {{ this_year }} {% endblock %}</h6>
+            <h6> Currency: {% block latest_currency %} {{ latest_currency }} {% endblock %}</h6>
+            
+            <!-- PART 1 -->
+            <label><h3>Monetary analysis</h3></label>
+            <table class="table table-striped">
+                <thead>
+                    <th class="text-start"></th>
+                </thead>
+                <tbody>
+                    <td>Total Incomes this year: <strong>{% block total_income_from_this_year_formatted %}{{ total_income_from_this_year_formatted }}{% endblock %}</strong></td> 
+                </tbody>
+            </table>
 
-    <br>
+            <!-- PART 2 -->
+            <table class="table table-striped">
+                <thead>
+                    <th class="text-start"></th>
+                </thead>
+                <tbody>
+                    <td>Total Expenses this year: <strong>{% block total_expense_from_this_year_formatted %}{{ total_expense_from_this_year_formatted }} {% endblock %}</strong>
+                </tbody>
+            </table>
 
-    total_expense_from_this_year_formatted = {% block total_expense_from_this_year_formatted %}{{ total_expense_from_this_year_formatted }} {% endblock %}
-    
-    <br>
-
-    results over income per plan = {% block formated_perc %}{{ formated_perc }} {% endblock %}
-    
-    <br>
-
-    total types of plan = {% block total_types_of_expenses %}{{ total_types_of_expenses }} {% endblock %}
-    <br>
-
-    average_total_income_per_plan_f = {% block average_total_income_per_plan_f %}{{ average_total_income_per_plan_f }} {% endblock %}
-    <br>
-
-    average_total_expense_per_plan_f = {% block average_total_expense_per_plan_f %}{{ average_total_expense_per_plan_f }} {% endblock %}
-    <br>
+            <!-- PART 3 -->
+            <table class="table table-striped">
+                <thead>
+                    <th class="text-start"></th>
+                </thead>
+                <tbody>
+                    <td>Average of Results per plan: <strong>{% block formated_perc %}{{ formated_perc }} {% endblock %}</strong>
+                </tbody>
+            </table>
 
 
-    result_over_4_weeks = {% block result_over_4_weeks %}{{ result_over_4_weeks }} {% endblock %}
-    <br>
-    <br>
+            <!-- PART 3 -->
+            <table class="table table-striped">
+                <thead>
+                    <th class="text-start"></th>
+                </thead>
+                <tbody>
+                    <td>Average of Total Incomes per plan: <strong>{% block average_total_income_per_plan_f %}{{ average_total_income_per_plan_f }} {% endblock %}</strong>
+                </tbody>
+            </table>
+
+            <!-- PART 4 -->
+            <table class="table table-striped">
+                <thead>
+                    <th class="text-start"></th>
+                </thead>
+                <tbody>
+                    <td>Average of Total Expenses per plan: <strong>{% block average_total_expense_per_plan_f %}{{ average_total_expense_per_plan_f }} {% endblock %}</strong>
+                </tbody>
+            </table>
+
+            <!-- PART 4 -->
+            <table class="table table-striped">
+                <thead>
+                    <th class="text-start"></th>
+                </thead>
+                <tbody>
+                    <td>Results over 4 weeks (1 month): <strong>{% block result_over_weeks %}{{ result_over_weeks }} {% endblock %}</strong>
+                </tbody>
+            </table>
+
+
+            <!-- Non monetary part -->
+            <label><h3>Some other data</h3></label>
+            <table class="table table-striped">
+                <thead>
+                        <th class="text-start"></th>
+                        <th class="text-center"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                      <td>Plans Created: {% block content1212122 %}{{ num_plans }}{% endblock %}</td> 
+                      <td>Total types of Expenses: {% block total_types_of_expenses %}{{ total_types_of_expenses }}{% endblock %} </td>
+                </tbody>
+            </table>
+
+        </div>
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawIncomeChart);
+            google.charts.setOnLoadCallback(drawExpenseChart);
+            google.charts.setOnLoadCallback(drawAllIncomeChart);
+            google.charts.setOnLoadCallback(drawAllExpenseChart);
+            
+
+            function drawIncomeChart() {
+              var data = google.visualization.arrayToDataTable([
+                ['Income Name', 'Income Value'],
+                {% for name, value in currplan_income_data %}
+                  ['{{ name }}', {{ value }}],
+                {% endfor %}
+              ]);
+      
+      
+              var options = {
+                title: "This plan's Income Breakdown",
+                chartArea: {width: '50%'},
+                hAxis: {
+                  title: 'Total Expenses',
+                  minValue: 0
+                },
+                vAxis: {
+                  title: 'Expense Name'
+                }
+              };
+      
+              var chart = new google.visualization.PieChart(document.getElementById('income_chart'));
+              chart.draw(data, options);
+            }
+      
+            function drawExpenseChart() {
+              var data = google.visualization.arrayToDataTable([
+                ['Expense Name', 'Expense Value'],
+                {% for name, value in currplan_expense_data %}
+                  ['{{ name }}', {{ value }}],
+                {% endfor %}
+              ]);
+      
+              var options = {
+                title: "This plan's Expense Breakdown",
+                chartArea: {width: '50%'},
+                hAxis: {
+                  title: 'Total Expenses',
+                  minValue: 0
+                },
+                vAxis: {
+                  title: 'Expense Name'
+                }
+              };
+      
+              var chart = new google.visualization.PieChart(document.getElementById('expense_chart'));
+              chart.draw(data, options);
+            }
+
+            function drawAllIncomeChart() {
+              var data = google.visualization.arrayToDataTable([
+                ['Income Name', 'Income Value'],
+                {% for name, value in all_income_data %}
+                  ['{{ name }}', {{ value }}],
+                {% endfor %}
+              ]);
+      
+      
+              var options = {
+                title: "All plans Income Breakdown",
+                chartArea: {width: '50%'},
+                pieHole: 0.4,
+                hAxis: {
+                  title: 'Total Expenses',
+                  minValue: 0
+                },
+                vAxis: {
+                  title: 'Expense Name'
+                }
+              };
+      
+              var chart = new google.visualization.PieChart(document.getElementById('all_income_chart'));
+              chart.draw(data, options);
+            }
+
+            function drawAllExpenseChart() {
+              var data = google.visualization.arrayToDataTable([
+                ['Income Name', 'Income Value'],
+                {% for name, value in all_expense_data %}
+                  ['{{ name }}', {{ value }}],
+                {% endfor %}
+              ]);
+      
+      
+              var options = {
+                title: "All plans Expense Breakdown",
+                chartArea: {width: '50%'},
+                pieHole: 0.4,
+                hAxis: {
+                  title: 'Total Expenses',
+                  minValue: 0
+                },
+                vAxis: {
+                  title: 'Expense Name'
+                }
+              };
+      
+              var chart = new google.visualization.PieChart(document.getElementById('all_expense_chart'));
+              chart.draw(data, options);
+            }
+
+          </script>
 
     {% endblock %}

@@ -218,7 +218,26 @@ form {
 
 
 
-  .graphs {
-    background-color: #f2f2f2;
-    
+
+
+.User_data_dashboard {
+    align-items: center;
+    text-align: center;
+    background-color: #b1ffd1;
+    min-height: 500px;
+    height: auto;
+    min-width: 800px;
+    width: auto;
+
+}
+
+#chart_container {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #d6d6d6;
+  }
+  #income_chart,
+  #expense_chart {
+    width: 50%;
+    height: 400px;
   }

@@ -34,7 +34,7 @@
 
         <nav class="bg-light border navbar navbar-expand-md navbar-light">
             <div class="container-fluid">
-                <img src="static/logo_ultimate_finance.png" alt="logo" width="200" height="auto" class="nav-link" href="/"/>
+                <a href="/"><img src="static/logo Personances.png" alt="logo" width="200" height="auto" class="nav-link"/></a>
                 <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -48,6 +48,7 @@
                             <li class="nav-item"><a class="nav-link" href="/add_expense">Add Expense</a></li>
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">
+                            <li class="nav-item"><a class="nav-link">Currency: {% block latest_currency %}{{ latest_currency}}{% endblock %}</a></li>
                             <li class="nav-item"><a class="nav-link">{% for name in name %}{{ name.name }}{% endfor %}</a></li>
                             <button class="nav-item" href="/settings"><i class="fa fa-gear" ></i></button>
                             <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
@@ -70,14 +71,12 @@
                 </div>
             </header>
         {% endif %}
-        <div class="usd_values">
-            <p> Currency: ARS</p>
-        </div>
+
         <main class="container-fluid py-5 text-center">
             {% block main %}{% endblock %}
         </main>
 
-        <footer class="mb-5 small text-center text-muted">
+        <footer class="mb-5 small text-center text-muted footer">
             Ignacio Beines Furcada CS50x Final Project 
         </footer>
 
