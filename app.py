@@ -14,8 +14,8 @@ import pandas as pd
 import time
 from datetime import date, datetime, timedelta
 from extras import login_required, MagerDicts
-#from forms import AddPlan
 
+import random
 
 
 # Configure application
@@ -123,14 +123,47 @@ def login():
 @app.route("/")
 @login_required
 def index():
+
     user_id = session["user_id"] 
     name = db.execute("SELECT name FROM users WHERE id = ?", user_id)
 
-    if request.method == "GET":
+    # Get latest plan_id
+    plan_id_index = db.execute("SELECT id FROM plans WHERE user_id = ? ORDER BY id DESC limit 1", user_id)
+    index = plan_id_index[0]
+    plan_id = index["id"]
 
-        return render_template("index.html", name=name)
+    incomes = db.execute("SELECT name, sum(income) AS income FROM incomes WHERE user_id = ? AND plan_id = ? GROUP BY name ORDER BY day_added ASC", user_id, plan_id)
+    expenses = db.execute("SELECT * FROM expenses WHERE user_id = ? AND plan_id=? ORDER BY day_added ASC", user_id, plan_id)
+    plan = db.execute("SELECT * FROM plans WHERE user_id = ? AND id = ?;", user_id, plan_id)
 
-    return render_template("/", name=name)
+    # creating variables for analysis
+    result_over_weeks = 0
+
+    #check if there is already a plan created
+    if plan[0] is not None: 
+
+        # creating an index variable for easy treatment
+        if incomes[0] is not None:
+            income_index = incomes[0]
+
+        if expenses[0]  is not None:     
+            expense_index = expenses[0]
+        
+        if plan_income is not None:
+            plan_income = plan[0]
+
+        if plan_income["period"] == "Month":
+            
+            #calculate result / 4 (for weekend expenses)
+            result_over_weeks = int(plan_income["result"]) / 4
+
+
+    
+
+
+
+
+    return render_template("index.html", name=name, incomes=incomes, result_over_weeks=result_over_weeks)
 
 
 @app.route("/logout")
@@ -197,7 +230,7 @@ def copy_plan(plan_id):
     # DATABASE INSERTS
     new_plan_name = old_plan_name + "[1]"
     # INSERT NEW PLAN INTO PLANS
-    db.execute("INSERT INTO plans (id, day_added, name, period, total_income, total_expense, result, user_id) VALUES (:new_plan_id, :day_added, :old_plan_name, :old_PERIOD, :old_total_income, :old_total_expense, :old_result, :user_id)",
+    prim_key = db.execute("INSERT INTO plans (id, day_added, name, period, total_income, total_expense, result, user_id) VALUES (:new_plan_id, :day_added, :old_plan_name, :old_PERIOD, :old_total_income, :old_total_expense, :old_result, :user_id)",
                 new_plan_id=new_plan_id,
                 day_added=day_added,
                 old_plan_name=new_plan_name,
@@ -234,7 +267,10 @@ def copy_plan(plan_id):
                     curr_expense=curr_expense, 
                     curr_name=curr_name)
 
-    return render_template("copy_plan.html", new_plan_id=new_plan_id)
+    flash(f"Old plan {old_plan_id} copied. New plan {new_plan_id} added!")
+
+        
+    return render_template("plans.html", plans=plans)
     
 
 

@@ -10,42 +10,47 @@
         <h2 style="text-align:center">Welcome yo your Dashboard, {{ name.name }}</h2>
         {% endfor %}
     </div>
-
-    <br>    
     <div>
-        <h6 style="text-align:center">Here you will find the list of taxes you have. To add a new one, click "Add new tax".</h6>
+        <h5>Here you will see your current plan information.</h5>
     </div>
-    <br>
-        
-    <form action="/new_tax" method="post">    
-        <div>
-            <a href="/new_tax" class="button" >Add new tax</a>
-        </div>
-    <br>
 
-    </form>
 
-    <main class="container py-5 text-center">
+    <!-- CURRENT PLAN DASHBOARD -->
 
-        <table class="table table-striped">
-            <thead>
+    {% for key, value in incomes %}
+    {% if value is string %}
+        ["{{ key }}", "{{ value }}"],
+    {% else %}
+        ["{{ key }}", {{ value }}],
+    {% endif %}
+    {% endfor %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="text-start">Tax ID</th>
+                <th class="text-center">Tax Name</th>
+                <th class="text-center">Country</th>
+                <th class="text-end">Percentage</th>
+                <th style="color: blue" class="text-end">Add tax</th>
+            </tr>
+        </thead>
+    <tbody>
+            {% for key, values in incomes %}
                 <tr>
-                    <th class="text-start">Tax ID</th>
-                    <th class="text-center">Tax Name</th>
-                    <th class="text-center">Country</th>
-                    <th class="text-end">Percentage</th>
+                    <td class="text-start">{{ incomes[key] }}</td>
+                    <td class="text-start">{{ incomes[values] }}</td>
                 </tr>
-            </thead>
-           <tbody>
-                {% for taxes in taxes %}
-                    <tr>
-                        <td class="text-start">{{ taxes.id }}</td>
-                        <td class="text-center">{{ taxes.name }}</td>
-                        <td class="text-center">{{ taxes.country }}</td>
-                        <td class="text-end">{{ taxes.percentage }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </main>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- PAST PLANS DASHBOARD -->
+    <br> <hr><br><h2> </h2><br>
+    
+    <div class="history_dashboard">
+        <div id="piechart" style="width: 900px; height: 500px;"></div>
+    </div>
+
+
+
 {% endblock %}

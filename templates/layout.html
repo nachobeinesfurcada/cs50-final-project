@@ -23,7 +23,36 @@
 
         <link href="/static/styles.css" rel="stylesheet">
 
+        <!-- dashboard -->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
         <title>Ultimate Finance: {% block title %}{% endblock %}</title>
+
+        <script type="text/javascript">
+            google.charts.load("current", {packages:["corechart"]});
+            google.charts.setOnLoadCallback(drawChart);
+            function drawChart() {
+              var data = google.visualization.arrayToDataTable([
+                {% for key, value in incomes %}
+                    ['{{ key }}', {{ value }}],
+                {% endfor %}
+              ]);
+      
+            var options = {
+              legend: 'none',
+              pieSliceText: 'label',
+              title: 'Incomes on this Plan',
+              pieStartAngle: 0,
+            };
+      
+              var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+              chart.draw(data, options);
+            }
+          </script>
+
+
+
+
 
     </head>
 
