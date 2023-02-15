@@ -457,7 +457,12 @@ def edit_plan(plan_id):
         # Ensure income name not taken
         if len(rows) != 0:
             flash(u'Please provide other Income Name. This name has already been taken', 'error')
-            
+            return render_template("edit_plan.html", plans=plans, plan_name=plan_name, 
+                                            plan_id=plan_id, PERIOD=PERIOD, 
+                                            expenses=expenses, types_of_expenses=types_of_expenses,
+                                            currencies=currencies, incomes=incomes, total_income_format=total_income_format,
+                                            total_expense_format=total_expense_format, result_format=result_format)
+
         # GET EXPENSES
         expense_name = request.form.get("expense_name")
         expense = request.form.get("expense")
@@ -476,8 +481,9 @@ def edit_plan(plan_id):
             # update plans database with this plans id
             
             total_income = int(total_income) + int(income)
-            result = int(total_income) - total_expense
-            
+            result = int(result) + int(income)
+
+          
         
             # INSERT incomes database with this plans id
             db.execute("INSERT INTO incomes (day_added, name, user_id, currency, income, plan_id) VALUES (:day_added, :name, :user_id, :currency, :income, :plan_id)",
@@ -515,8 +521,9 @@ def edit_plan(plan_id):
             result = int(result) - int(index["income"])
 
             # delete from table
-            db.execute('DELETE FROM incomes WHERE name=:income_to_delete', 
-                        income_to_delete=income_to_delete)
+            db.execute('DELETE FROM incomes WHERE name=:income_to_delete AND plan_id =:plan_id', 
+                        income_to_delete=income_to_delete,
+                        plan_id=plan_id)
             
             # update total income on plans table
             db.execute('UPDATE plans SET total_income = :total_income, result = :result WHERE user_id=:user_id AND id=:plan_id',
