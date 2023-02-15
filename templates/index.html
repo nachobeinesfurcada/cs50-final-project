@@ -5,43 +5,41 @@
 {% endblock %}
 
 {% block main %}
+
+   <!-- TITLE -->
     <div>
         {% for name in name %}
         <h2 style="text-align:center">Welcome yo your Dashboard, {{ name.name }}</h2>
         {% endfor %}
-    </div>
-    <div>
-        
         <h5>Here you will see your current plan information.</h5>
-    
-    </div>
-    
-    <!-- THIS PLANS CHARTS -->
-    <div >
-        <div id="chart_container">
-            <div id="income_chart"></div>
-            <div id="expense_chart"></div>
-        </div>
     </div>
 
+        <!-- THIS PLANS CHARTS -->
+    <br><br>
+    <h3>Most recent plan's Data</h3>
+    <h6 style="color:rgb(255, 102, 0)">Current Plan: {% block current_plan %} {{plan_id}}: "{{plan_name}}" {% endblock %}</h6>
+    <p> To see see and edit the current period, click <a href="edit_plan/{% block current_plan2 %}{{plan_id}}{% endblock %} "{{plan_name}}">here</a>.</p>
+  
 
+    <div id="chart_container">
+        <div id="income_chart"></div>
+        <div id="expense_chart"></div>
+    </div>
 
-
-
-
-
-   <h2> </h2><br>
-
-
+    
     <!-- PAST PLANS DASHBOARD -->
-    <div >
+    <br><br>
+    <h3>All the data from this years' Plans</h3>
+    <h6 style="color:rgb(255, 102, 0)">Total plans: {% block num_plans %}{{ num_plans }}{% endblock %}</h6>
+    <p> To see see, edit or delete any plan, click <a href="plans">here</a>.</p>
+  
     <div id="chart_container">
         <div id="all_income_chart"></div>
         <div id="all_expense_chart"></div>
     </div>
-</div>
 
 
+<br><br><br>
         <div class="User_data_dashboard container">
             <h2 style="color:rgb(112, 157, 194)">Some of your usefull information, analysed </h2>
             <h6> Year:{% block _this_year %} {{ this_year }} {% endblock %}</h6>

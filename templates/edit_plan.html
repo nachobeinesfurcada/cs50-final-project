@@ -9,21 +9,23 @@
 
     <main>
         
-        <h2 style="color:red">Edit Plan</h2>
-
+        <h2 style="color:rgb(255, 174, 0)">Edit Plan</h2>
+        <h6> On this page, you will be able to edit all parts of your plan.</h6>
+        <h6> To save, hit the submit button on every part you wish to change.</h6>
+        <br>
 
         <div class="summary">
-            <br><h2>Plan <a style="color:blue">{% block content8 %} {{ plan_name }} {% endblock %}</a> Summary</h2><br>
+            <br><h2>Plan <a style="color:rgb(255, 174, 0)">{% block content8 %} {{ plan_name }} {% endblock %}</a> Summary</h2><br>
             <h4>Plan ID: {% block content1 %} <a style="color:rgb(255, 122, 45)">{{ plan_id }}</a> {% endblock %}</h4>
             <br>
             <table class="summary_table text-center" style="width:90%">
                 <tr>
-                    <th>Period</th>
+                    <th style="width:33%">Period</th>
                     <th>Total Income</th>
                     <th>Total Expenses</th>
                     <th>Result</th>
                 </tr>
-                <tr>
+                <tr style="height: 70px;">
                     <td>{% block content3 %}{{ PERIOD }}{% endblock %}</td>
                     <td>{% block content10 %}{{ total_income_format }}{% endblock %}</td>
                     <td>{% block content13 %}{{ total_expense_format }}{% endblock %}</td>

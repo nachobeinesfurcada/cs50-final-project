@@ -46,18 +46,16 @@
             </colgroup> -->  
             <thead>
                 <tr>
-                    <th class="text-start">Expense ID</th>
-                    <th class="text-center">Date added</th>
                     <th class="text-center"><strong>Name</strong></th>
+                    <th class="text-center">Date added</th>
                     <th style="width:50%" class="text-center">Description</th>
                 </tr>
             </thead>
            <tbody>
                 {% for expense_type in types_of_expenses %}
                     <tr>
-                        <td class="text-start">{{ expense_type.id }}</td>
-                        <td class="text-center">{{ expense_type.day_added }}</td>
                         <td class="text-center"><strong>{{ expense_type.name }}</strong></td>
+                        <td class="text-center">{{ expense_type.day_added }}</td>                      
                         <td class="text-center">{{ expense_type.description }}</td>
                     </tr>
                 {% endfor %}

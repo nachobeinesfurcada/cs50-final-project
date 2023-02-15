@@ -26,13 +26,13 @@
         <!-- dashboard -->
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-        <title>Ultimate Finance: {% block title %}{% endblock %}</title>
+        <title>Personances: {% block title %}{% endblock %}</title>
 
     </head>
 
     <body>
 
-        <nav class="bg-light border navbar navbar-expand-md navbar-light">
+        <nav class=" bg-light border navbar navbar-expand-md navbar-light header_color">
             <div class="container-fluid">
                 <a href="/"><img src="static/logo Personances.png" alt="logo" width="200" height="auto" class="nav-link"/></a>
                 <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
@@ -50,7 +50,7 @@
                         <ul class="navbar-nav ms-auto mt-2">
                             <li class="nav-item"><a class="nav-link">Currency: {% block latest_currency %}{{ latest_currency}}{% endblock %}</a></li>
                             <li class="nav-item"><a class="nav-link">{% for name in name %}{{ name.name }}{% endfor %}</a></li>
-                            <button class="nav-item" href="/settings"><i class="fa fa-gear" ></i></button>
+                            <a class="nav-item" href="/settings"><i class="fa fa-gear" ></i></a>
                             <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
                             
                         </ul>

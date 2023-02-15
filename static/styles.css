@@ -22,6 +22,9 @@ a.button {
     color: blue;
 }
 
+.header_color {
+    background-color: #616161;
+}
 
 
 
@@ -172,16 +175,19 @@ form {
     align-items: center;
     text-align: center;
     position: relative;
+
+    width: auto;
+    border-radius: 10px;
 }
 
 .summary_table {
     margin: 10px auto;
     position: relative;
     padding: 15px;
-    font-size: 30px;
-
-
+    font-size: 25px;
+    margin:auto;
 }
+tr:hover {background-color: coral;}
 
 .summary.content {
     font-size: 12px;
@@ -234,10 +240,15 @@ form {
 #chart_container {
     display: flex;
     flex-wrap: wrap;
-    background-color: #d6d6d6;
+    background-color: #ffffff;
   }
   #income_chart,
   #expense_chart {
+    width: 50%;
+    height: 400px;
+  }
+  #all_income_chart,
+  #all_expense_chart {
     width: 50%;
     height: 400px;
   }
